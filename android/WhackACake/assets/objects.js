@@ -1,5 +1,3 @@
-var foo=0;
-
 objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
@@ -30,12 +28,6 @@ objects = function(gameobj){
 
                 $this.height++;
                 $this.cakeTypeToDraw = -1;
-
-                if ($this.height == 4) {
-                    gameobj.game.incrementCakes();
-                    this.cleanCakeStack();
-                    $this.height = 0;
-                }
             }
         };
 
@@ -91,8 +83,8 @@ objects = function(gameobj){
         this.img_coords = new gameobj.Coords(img_x, img_y);
         this.width = width;
         this.height = height;
-        this.img_width = img_width;
-        this.img_height = img_height;
+        this.image_width = width;
+        this.image_height = height;
         this.spriteImage = spriteImage;
         this.animation = null;
 
@@ -108,10 +100,9 @@ objects = function(gameobj){
                     console.log("finished");
                 }
             }
-
-            if (this.img_coords.x != null && this.img_coords.y != null) {
+            if (this.img_coords.x && this.img_coords.y) {
                 ctx.drawImage(this.spriteImage,
-                            this.img_coords.x, this.img_coords.y, this.img_width, this.img_height,
+                            this.img_coords.x, this.img_coords.y, this.image_width, this.image_height,
                             this.coord.x-this.width/2,
                             this.coord.y-this.height/2,
                             this.width,
@@ -165,15 +156,7 @@ objects = function(gameobj){
     gameobj.RepeatingAnimation = function(animations){
     }
     
-    gameobj.CakeSlice = function(sprite){
-    	var $this = this;
-        this.sprite = sprite;
-
-        this.draw = function(ctx){
-            this.sprite.draw(ctx);
-        }
-    };
-
+    
     
     /**
  	 *
@@ -221,10 +204,9 @@ objects = function(gameobj){
     }
 
 
-    gameobj.Ingredient = function(type_no){
+    gameobj.Ingredient = function(sprite){
     	var $this = this;
-    	this.type_no = type_no
-    	this.sprite = new gameobj.Sprite(null, null, 50, 50, gameobj.game.images.ingredients, 0, type_no*160, 212, 160);
+    	this.sprite = sprite;
     	this.visible = false;
     	this.expiryTime = gameobj.frameCount + (2*1000.0)/gameobj.game.loopInterval;
     	this.wasHit = false;
@@ -256,7 +238,7 @@ objects = function(gameobj){
         }
 
         this.getType = function() {
-            return type_no;
+            return 0;
         }
     }
 

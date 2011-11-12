@@ -59,15 +59,11 @@ var whackacake = function all() {
     var Game = function() {
         var $this = this;
 
-        this.incrementCakes = function() {
-            $this.cakesFinished++;
-        }
         this.init = function() {
             $this.score = 0;
-            $this.cakesFinished = 0;
-            $this.loopInterval = 15;
+            $this.loopInterval = 15
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability =   $this.loopInterval / 1000;
+            $this.spawnProbability =   $this.loopInterval / 1000
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -76,7 +72,6 @@ var whackacake = function all() {
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
-            $this.cakesDisplay = document.getElementById("cakes");
             $this.ctx = my.canvas.getContext('2d');
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
@@ -102,7 +97,7 @@ var whackacake = function all() {
             if (Math.random() < $this.spawnProbability) {
                 var cup = $this.getRandomCup()
                 if (!cup.hasIngredient()) {
-       	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
+       	   	         cup.setIngredient(new my.Ingredient(new my.SpriteFromWidthHeightAndImage(50, 50, $this.images.choc))); // Choose a random ingredient
        	   	    }
        		}
 			$this.cups.forEach(function(c) { c.updateState(); });
@@ -152,13 +147,11 @@ var whackacake = function all() {
 
         this.loadImages = function() {
             $this.images.cup = new Image();
-            $this.images.cup.src = "images/cup.jpeg";
+            $this.images.cup.src = "file:///android_asset/images/cup.jpeg";
             $this.images.choc = new Image();
-            $this.images.choc.src = "images/chocolate.jpg";
+            $this.images.choc.src = "file:///android_asset/images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
-            $this.images.cakeLayers.src = "images/cake_layers.png";
-            $this.images.ingredients = new Image;
-            $this.images.ingredients.src = "images/ingredients.png"
+            $this.images.cakeLayers.src = "file:///android_asset/images/cake_layers.png";
         }
 
 
@@ -194,10 +187,6 @@ var whackacake = function all() {
           cup_idx = Math.floor(Math.random()*$this.cups.length)
           return $this.cups[cup_idx];
         }
-        
-        this.getRandomIngredient = function() {
-          return new my.Ingredient(Math.floor(Math.random()*10));
-        }
 
         this.drawAll = function() {
 
@@ -205,7 +194,6 @@ var whackacake = function all() {
 
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
-            this.cakesDisplay.innerHTML = $this.cakesFinished;
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
