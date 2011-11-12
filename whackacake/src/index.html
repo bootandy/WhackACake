@@ -3,15 +3,37 @@
     <title>Whack a Mole - Children in Need</title>
     <script type="text/javascript" src="objects.js" charset="utf-8"></script>
     <script type="text/javascript" src="game.js" ></script>
+
+    <style>
+        #score_div{
+            color: #222;
+            font-size: 20pt;
+            text-shadow: 0px 2px 3px #555;
+            position:absolute;
+            left:680px;
+            top:20px;
+        }
+        #cake_div {
+            color: #222;
+            font-size: 20pt;
+            text-shadow: 0px 2px 3px #555;
+            position:absolute;
+            left:130px;
+            top:20px;
+        }
+    </style>
 </head>
 
 <body onload="whackacake.init()">
-<div id='game_score' style='location:absolute; :400; ' >0</div>
+<div id='score_div' >Score:<span id='game_score' >0</span></div>
+<div id="cake_div">
+Cakes Made: <span id='cakes' >0</span>
+</div>
 
-<canvas id="cake_stack"  style="border: 1px solid black;padding: 0px; margin: 0px;" >
+<canvas id="cake_stack"  style="border: 1px solid black;padding: 0; margin: 0;" >
 </canvas>
 
-<canvas id="c"  style="border: 1px solid black;padding: 0px; margin: 0px;">
+<canvas id="c"  style="border: 1px solid black;padding: 0; margin: 0;">
     <p>
         sorry you need a modern browser
     </p>
@@ -19,9 +41,6 @@
 
 <div id="frame_div">
 Frames: <span id='frames' >0</span>
-</div>
-<div id="cake_div">
-Cakes: <span id='cakes' >0</span>
 </div>
 
 </body>

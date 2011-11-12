@@ -25,8 +25,8 @@ var whackacake = function all() {
     my.init = function() {
         my.canvas = document.getElementById("c");
         my.canvas_cake_stack = document.getElementById("cake_stack");
-        var screenWidth = 500;
-        var screenHeight = 400;
+        var screenWidth = 700;
+        var screenHeight = 600;
         var cakeStackWidth = 100;
 
         var style = my.canvas.getAttribute("style");
