@@ -28,6 +28,12 @@ objects = function(gameobj){
 
                 $this.height++;
                 $this.cakeTypeToDraw = -1;
+
+                if ($this.height == 4) {
+                    gameobj.game.incrementCakes();
+                    this.cleanCakeStack();
+                    $this.height = 0;
+                }
             }
         };
 
@@ -156,7 +162,15 @@ objects = function(gameobj){
     gameobj.RepeatingAnimation = function(animations){
     }
     
-    
+    gameobj.CakeSlice = function(sprite){
+    	var $this = this;
+        this.sprite = sprite;
+
+        this.draw = function(ctx){
+            this.sprite.draw(ctx);
+        }
+    };
+
     
     /**
  	 *

@@ -59,11 +59,15 @@ var whackacake = function all() {
     var Game = function() {
         var $this = this;
 
+        this.incrementCakes = function() {
+            $this.cakesFinished++;
+        }
         this.init = function() {
             $this.score = 0;
-            $this.loopInterval = 15
+            $this.cakesFinished = 0;
+            $this.loopInterval = 15;
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability =   $this.loopInterval / 1000
+            $this.spawnProbability =   $this.loopInterval / 1000;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -72,6 +76,7 @@ var whackacake = function all() {
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
+            $this.cakesDisplay = document.getElementById("cakes");
             $this.ctx = my.canvas.getContext('2d');
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
@@ -194,6 +199,7 @@ var whackacake = function all() {
 
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
+            this.cakesDisplay.innerHTML = $this.cakesFinished;
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
