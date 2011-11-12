@@ -212,6 +212,8 @@ var whackacake = function all() {
                 $this.cups[i].draw($this.ctx);
             }
 
+            $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
+
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
     }

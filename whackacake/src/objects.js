@@ -4,43 +4,42 @@ objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
         this.cakeImage = cakeImage;
-        this.height = 0;
         this.cakeTypeToDraw = -1;
+        this.cakeSlices = [];
 
         this.addToCakeStack = function(type) {
             $this.cakeTypeToDraw = type;
+
+            var x = 50;
+            var cakeLayerHeight = 50;
+            var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
+            var cakeLayerSourceHeight = 154;
+            var cakeLayerSourceWidth = 300;
+
+            var y = gameobj.canvas_cake_stack.height - 100;
+            y = y - cakeLayerHeightOverlay * $this.cakeSlices.length;
+
+            var s = new gameobj.Sprite(
+                    x, y, 100, cakeLayerHeight,
+                    cakeImage,
+                    0, cakeLayerSourceWidth, cakeLayerSourceWidth, cakeLayerSourceHeight
+            );
+
+            $this.cakeSlices.push(new gameobj.CakeSlice(s));
         };
 
         this.draw = function(ctx_cake_stack) {
-            // If we have a new layer to draw
-            if ($this.cakeTypeToDraw != -1) {
 
-                var x = 0;
-                var cakeLayerHeight = 50;
-                var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
-                var cakeLayerSourceHeight = 154;
-                var cakeLayerSourceWidth = 300;
-
-                var y = gameobj.canvas_cake_stack.height - 100;
-                y = y - cakeLayerHeightOverlay * $this.height;
-
-                ctx_cake_stack.drawImage(cakeImage,
-                        0, cakeLayerSourceHeight * $this.cakeTypeToDraw, cakeLayerSourceWidth, cakeLayerSourceHeight,
-                        x, y, 100, cakeLayerHeight);
-
-                $this.height++;
-                $this.cakeTypeToDraw = -1;
-
-                if ($this.height == 4) {
-                    gameobj.game.incrementCakes();
-                    this.cleanCakeStack();
-                    $this.height = 0;
-                }
+            // If we have finished a cake
+            if ($this.cakeSlices.length == 3) {
+                gameobj.game.incrementCakes();
+                $this.cakeSlices = [];
             }
-        };
 
-        this.cleanCakeStack = function() {
-            $this.ctx_cake_stack.clearRect(0, 0, gameobj.ctx_cake_stack.width, gameobj.ctx_cake_stack.height);
+            var i;
+            for(i =0; i < $this.cakeSlices.length; i++) {
+                $this.cakeSlices[i].draw(ctx_cake_stack);
+            }
         };
 
     };
