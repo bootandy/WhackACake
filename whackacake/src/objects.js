@@ -104,10 +104,10 @@ objects = function(gameobj){
             if (this.img_coords.x != null && this.img_coords.y != null) {
                 ctx.drawImage(this.spriteImage,
                             this.img_coords.x, this.img_coords.y, this.img_width, this.img_height,
-                            this.image_width,
-                            this.image_height,
-                            this.width,
-                            this.height);
+                            Math.floor(this.coord.x-this.width/2),
+                            Math.floor(this.coord.y-this.height/2),
+                            this.img_width,
+                            this.img_height);
             } else {
                 ctx.drawImage(this.spriteImage,
                         Math.floor(this.coord.x - this.width/2),
