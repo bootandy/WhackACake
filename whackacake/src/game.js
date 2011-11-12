@@ -1,4 +1,4 @@
-var game = function all() {
+var whackacake = function all() {
     my = {};
 
 
@@ -16,21 +16,24 @@ var game = function all() {
 
         console.debug("canvas: " + style);
 
-        my.gameLoop = new GameLoop();
-        my.gameLoop.init();
-        my.gameLoop.main();
+        my.game = new Game();
+        my.game.init();
+        my.game.loop();
     }
 
 
     ///---------------- objects ----------------
 
-    var GameLoop = function() {
+    var Game = function() {
         var $this = this;
 
         this.init = function() {
             $this.score = 0;
             $this.timer = 0;
+            $this.images = {};
+            $this.loadImages();
             $this.cups = this.createCups();
+            $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.ctx = my.canvas.getContext('2d');
             my.canvas.addEventListener('click', $this.checkClicks);
@@ -38,18 +41,18 @@ var game = function all() {
 
 
         //Main game loop
-        this.main = function() {
+        this.loop = function() {
 
             $this.score++;
             //moveSprite(player);
             $this.drawAll();
-            setTimeout("game.gameLoop.main()", 15);
+            setTimeout("whackacake.game.loop()", 15);
         }
 
         this.checkClicks = function(e) {
             var i;
-            console.log($this.cups);
             for (i = 0; i < $this.cups.length; i++) {
+                console.log("clicked");
                 if ($this.cups[i].isClickedOn(e.x, e.y)) {
                     //alert(' hit! ' + i);
                     console.log("clicked on "+i);
@@ -57,21 +60,27 @@ var game = function all() {
             }
         }
 
+        this.loadImages = function(){
+            $this.images.cup = new Image();
+            $this.images.cup.src = "images/cup.jpg";
+        }
+
+        
+        this.createIngredients = function(){
+            var chocImage = new Image
+        }
 
         this.createCups = function() {
             var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
 
-            var cupImage = new Image();
-            cupImage.src = "images/cup.jpeg";
-
             var result = [];
-            result.push(new Cup(screenWidth / 4, screenHeight / 4, cupImage));
-            result.push(new Cup(3 * screenWidth / 4, screenHeight / 4, cupImage));
-            result.push(new Cup(screenWidth / 2, screenHeight / 2, cupImage));
-            result.push(new Cup(screenWidth / 4, 3 * screenHeight / 4, cupImage));
-            result.push(new Cup(3 * screenWidth / 4, 3 * screenHeight / 4, cupImage));
-            console.debug(result);
+            result.push(new Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup));
+            result.push(new Sprite(3 * screenWidth / 4, screenHeight / 4, $this.images.cup));
+            result.push(new Sprite(screenWidth / 2, screenHeight / 2, $this.images.cup));
+            result.push(new Sprite(screenWidth / 4, 3 * screenHeight / 4, $this.images.cup));
+            result.push(new Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup));
+            console.log(result);
             return result;
         }
 
@@ -95,24 +104,24 @@ var game = function all() {
         this.y = yParam;
     }
 
-    var Cup = function(x, y, imageSource) {
+    var Sprite = function(x, y, spriteImage) {
         this.coord = new Coords(x, y);
-        this.spriteWidth = 40;
-        this.spriteHeight = 40;
-        this.cupImage = imageSource;
+        this.width = 40;
+        this.height = 40;
+        this.spriteImage = spriteImage;
 
         this.draw = function(ctx) {
-            ctx.drawImage(this.cupImage,
-                    this.coord.x - this.spriteWidth,
-                    this.coord.y - this.spriteHeight,
-                    this.spriteWidth * 2,
-                    this.spriteHeight * 2
+            ctx.drawImage(this.spriteImage,
+                    this.coord.x - this.width,
+                    this.coord.y - this.height,
+                    this.width * 2,
+                    this.height * 2
             );
         }
 
         this.isClickedOn = function(x, y) {
-            if (( this.coord.x - this.spriteWidth < x && this.coord.x + this.spriteWidth > x )
-                    && ( this.coord.y - this.spriteHeight < y && this.coord.y + this.spriteHeight > y )) {
+            if (( this.coord.x - this.width < x && this.coord.x + this.width > x )
+                    && ( this.coord.y - this.height < y && this.coord.y + this.height > y )) {
                 return true;
             }
             return false;
