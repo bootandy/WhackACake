@@ -81,10 +81,8 @@ var whackacake = function all() {
         this.updateState = function(){
             
             if (Math.random() < $this.spawnProbability) {
-                console.log("SPAWNING")
                 var cup = $this.getRandomCup()
                 if (!cup.hasIngredient()) {
-                     console.log("GOGOGO!")
        	   	         cup.setIngredient(new Ingredient(new Sprite(null, null, $this.images.choc))); // Choose a random ingredient
        	   	    }
        		}
