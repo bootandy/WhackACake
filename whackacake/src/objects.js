@@ -4,11 +4,15 @@ objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
         this.cakeImage = cakeImage;
-        this.cakeTypeToDraw = -1;
         this.cakeSlices = [];
 
         this.addToCakeStack = function(type) {
-            $this.cakeTypeToDraw = type;
+
+            // If we have finished a cake
+            if ($this.cakeSlices.length == 5) {
+                gameobj.game.incrementCakes();
+                $this.cakeSlices = [];
+            }
 
             var x = 50;
             var cakeLayerHeight = 50;
@@ -22,20 +26,13 @@ objects = function(gameobj){
             var s = new gameobj.Sprite(
                     x, y, 100, cakeLayerHeight,
                     cakeImage,
-                    0, cakeLayerSourceWidth, cakeLayerSourceWidth, cakeLayerSourceHeight
+                    0, cakeLayerSourceHeight * type, cakeLayerSourceWidth, cakeLayerSourceHeight
             );
 
             $this.cakeSlices.push(new gameobj.CakeSlice(s));
         };
 
         this.draw = function(ctx_cake_stack) {
-
-            // If we have finished a cake
-            if ($this.cakeSlices.length == 3) {
-                gameobj.game.incrementCakes();
-                $this.cakeSlices = [];
-            }
-
             var i;
             for(i =0; i < $this.cakeSlices.length; i++) {
                 $this.cakeSlices[i].draw(ctx_cake_stack);
@@ -171,6 +168,9 @@ objects = function(gameobj){
     gameobj.CakeSlice = function(sprite){
     	var $this = this;
         this.sprite = sprite;
+        this.sprite.animation = new gameobj.TransAnimation(new gameobj.Coords(50, 0),
+                                                             $this.sprite.coord,
+                                                             gameobj.getDurationInFrames(500));
 
         this.draw = function(ctx){
             this.sprite.draw(ctx);
@@ -191,7 +191,7 @@ objects = function(gameobj){
     	
     	this.setIngredient = function(ingredient){
     		ingredient.sprite.coord = this.sprite.coord.clone();
-            ingredient.sprite.animation = new gameobj.TransAnimation($this.sprite.coord, 
+            ingredient.sprite.animation = new gameobj.TransAnimation($this.sprite.coord,
                                                              $this.sprite.coord.add(new gameobj.Coords(0, -10)),
                                                              gameobj.getDurationInFrames(500));
     		ingredient.sprite.coord = $this.sprite.coord.clone();
