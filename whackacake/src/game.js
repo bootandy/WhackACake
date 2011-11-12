@@ -4,15 +4,19 @@ var game = function all() {
 
     my.init = function() {
         my.canvas = document.getElementById("c");
-        var screenWidth = 600;
+        my.canvas_cake_stack = document.getElementById("cake_stack");
+        var screenWidth = 500;
         var screenHeight = 400;
+        var cakeStackWidth = 100;
 
         var style = my.canvas.getAttribute("style");
         my.canvas.setAttribute("style", style + "; height:" + screenHeight + "; width:" + screenWidth + ";");
+        my.canvas_cake_stack.setAttribute("style", style + "; height:" + cakeStackWidth + "; width:" + screenWidth + ";");
 
         my.canvas.height = screenHeight;
         my.canvas.width = screenWidth;
-
+        my.canvas_cake_stack.height = screenHeight;
+        my.canvas_cake_stack.width = screenWidth;
 
         console.debug("canvas: " + style);
 
@@ -88,6 +92,9 @@ var game = function all() {
             }
         }
 
+        this.drawCakeStack = function() {
+            
+        }
     }
 
     var Coords = function(xParam, yParam) {
