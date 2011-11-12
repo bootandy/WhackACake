@@ -1,3 +1,23 @@
+// http://www.tutorialspoint.com/javascript/array_foreach.htm
+if (!Object.prototype.forEach)
+{
+  Object.prototype.forEach = function(fun /*, thisp*/)
+  {
+    var len = this.length;
+    if (typeof fun != "function")
+      throw new TypeError();
+
+    var thisp = arguments[1];
+    for (var i = 0; i < len; i++)
+    {
+      if (i in this)
+        fun.call(thisp, this[i], i, this);
+    }
+  };
+}
+
+
+
 var whackacake = function all() {
     my = {};
 
@@ -37,6 +57,7 @@ var whackacake = function all() {
         this.init = function() {
             $this.score = 0;
             $this.loopInterval = 15
+            $this.spawnProbability =   1     *$this.loopInterval/1000 // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -58,13 +79,22 @@ var whackacake = function all() {
         }
         
         this.updateState = function(){
-       		$this.cups[2].setIngredient($this.ingredients[0]); 
+            
+            if (Math.random() < $this.spawnProbability) {
+                console.log("SPAWNING")
+                var cup = $this.getRandomCup()
+                if (!cup.hasIngredient()) {
+                     console.log("GOGOGO!")
+       	   	         cup.setIngredient(new Ingredient(new Sprite(null, null, $this.images.choc))); // Choose a random ingredient
+       	   	    }
+       		}
+			$this.cups.forEach(function(c) { c.updateState(); });
         }
 
         this.canvasClicked = function(e) {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.x, e.y) && $this.cups[i].hasIngredient()) {
+                if ($this.cups[i].sprite.isClickedOn(e.pageX, e.pageY) && $this.cups[i].hasIngredient()) {
                     $this.score += $this.cups[i].hit()
                 }
             }
@@ -95,7 +125,7 @@ var whackacake = function all() {
 
 			console.log('here');
 
-            var result = [];
+            var result = new Array;
             result.push(new Cup(new Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup)));
             result.push(new Cup(new Sprite(3 * screenWidth / 4, screenHeight / 4, $this.images.cup)));
             result.push(new Cup(new Sprite(screenWidth / 2, screenHeight / 2, $this.images.cup)));
@@ -105,6 +135,10 @@ var whackacake = function all() {
             return result;
         }
 
+        this.getRandomCup = function() {
+          cup_idx = Math.floor(Math.random()*$this.cups.length)
+          return $this.cups[cup_idx];
+        }
 
         this.drawAll = function() {
 
@@ -225,12 +259,13 @@ var whackacake = function all() {
             ingredient.sprite.animation = new TransAnimation($this.sprite.coord, 
                                                              $this.sprite.coord.add(new Coords(10, 0)),
                                                              1500);
+    		ingredient.sprite.coord = $this.sprite.coord.clone();
     		$this.ingredient = ingredient;
     	}
     	
     	this.updateState = function(){
-    		if(this.ingredient.isExpired()){
-    			this.ingredient = null;
+    		if($this.ingredient && $this.ingredient.isExpired()){
+    			$this.ingredient = null;
     		}
     	}
     	
@@ -242,13 +277,13 @@ var whackacake = function all() {
     	}
     	
     	this.hit = function() {
-			score = this.ingredient.getScore();
+			score = $this.ingredient.getScore();
 			this.ingredient.hit();
 			return score;
     	}
     	
     	this.hasIngredient = function(){
-    		return this.ingredient;
+    		return $this.ingredient;
     	}
 
     }
@@ -265,7 +300,7 @@ var whackacake = function all() {
     	var $this = this;
     	this.sprite = sprite;
     	this.visible = false;
-    	this.expiryTime = (2*1000.0)/my.game.loopInterval;
+    	this.expiryTime = my.frameCount + (2*1000.0)/my.game.loopInterval;
     	this.wasHit = false;
     	
     	this.isExpired = function(){
