@@ -62,10 +62,12 @@ var whackacake = function all() {
         this.init = function() {
             $this.score = 0;
             $this.loopInterval = 15
-            $this.spawnProbability =   1     *$this.loopInterval/1000 // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
+            // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
+            $this.spawnProbability =   $this.loopInterval / 1000
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
+            $this.cakeStack = new CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
@@ -97,13 +99,18 @@ var whackacake = function all() {
 
         this.canvasClicked = function(e) {
             var i;
-            console.log(e);
+
             for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.pageX, e.pageY) && $this.cups[i].hasIngredient()) {
-              	    
-                    $this.score += $this.cups[i].hit()
+                if ($this.cups[i].sprite.isClickedOn(e.offsetX, e.offsetY) && $this.cups[i].hasIngredient()) {
+                    $this.clickedIngredient($this.cups[i]);
                 }
             }
+        }
+
+        this.clickedIngredient = function(cup) {
+            var type = cup.hasIngredient().getType();
+            $this.cakeStack.addToCakeStack(type);
+            $this.score += cup.hit();
         }
 
         this.loadImages = function() {
@@ -160,33 +167,48 @@ var whackacake = function all() {
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
-            for (i = 0; i < 10; i++) {
-                $this.addAndDrawCakeStack(i, i);
+
+            $this.cakeStack.draw($this.ctx_cake_stack);
+        }
+    }
+
+    var CakeStack = function(cakeImage) {
+        $this = this;
+        this.cakeImage = cakeImage;
+        this.height = 0;
+        this.cakeTypeToDraw = -1;
+
+        this.addToCakeStack = function(type) {
+            $this.cakeTypeToDraw = type;
+        };
+
+        this.draw = function(ctx_cake_stack) {
+            // If we have a new layer to draw
+            if ($this.cakeTypeToDraw != -1) {
+
+                var x = 0;
+                var cakeLayerHeight = 50;
+                var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
+                var cakeLayerSourceHeight = 154;
+                var cakeLayerSourceWidth = 300;
+
+                var y = my.canvas_cake_stack.height - 100;
+                y = y - cakeLayerHeightOverlay * $this.height;
+
+                ctx_cake_stack.drawImage(cakeImage,
+                        0, cakeLayerSourceHeight * $this.cakeTypeToDraw, cakeLayerSourceWidth, cakeLayerSourceHeight,
+                        x, y, 100, cakeLayerHeight);
+
+                $this.height++;
+                $this.cakeTypeToDraw = -1;
             }
-
-        }
-
-        this.addAndDrawCakeStack = function(stackLayer, ingredientIndex) {
-            var x = 0;
-            var cakeLayerHeight = 50;
-            var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
-            var cakeLayerSourceHeight = 154;
-            var cakeLayerSourceWidth = 300;
-
-            var y = my.canvas_cake_stack.height - 100;
-            y = y - cakeLayerHeightOverlay * stackLayer;
-
-            $this.ctx_cake_stack.drawImage($this.images.cakeLayers,
-                    0, cakeLayerSourceHeight * ingredientIndex, cakeLayerSourceWidth, cakeLayerSourceHeight,
-                    x, y, 100, cakeLayerHeight);
-
-        }
+        };
 
         this.cleanCakeStack = function() {
             $this.ctx_cake_stack.clearRect(0, 0, my.ctx_cake_stack.width, my.ctx_cake_stack.height);
-        }
+        };
 
-    }
+    };
 
     var Coords = function(xParam, yParam) {
         this.x = xParam;
@@ -213,7 +235,7 @@ var whackacake = function all() {
 
 
     var Sprite = function(x, y, spriteImage) {
-
+        var $this = this;
         this.coord = new Coords(x, y);
         this.width = 40;
         this.height = 40;
@@ -241,8 +263,8 @@ var whackacake = function all() {
         }
 
         this.isClickedOn = function(x, y) {
-            if (( this.coord.x - this.width < x && this.coord.x + this.width > x )
-                    && ( this.coord.y - this.height < y && this.coord.y + this.height > y )) {
+            if (( $this.coord.x - $this.width < x && $this.coord.x + $this.width > x )
+                    && ( $this.coord.y - $this.height < y && $this.coord.y + $this.height > y )) {
                 return true;
             }
             return false;
@@ -359,6 +381,10 @@ var whackacake = function all() {
 
         this.hit = function() {
             this.wasHit = true;
+        }
+
+        this.getType = function() {
+            return 0;
         }
     }
 
