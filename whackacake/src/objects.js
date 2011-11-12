@@ -229,7 +229,8 @@ objects = function(gameobj){
         this.sprite.animation = new gameobj.TransAnimation(new gameobj.Coords(50, 0),
                                                              $this.sprite.coord,
                                                              gameobj.getDurationInFrames(500));
-
+        this.sprite.animation.start();
+        
         this.draw = function(ctx){
             this.sprite.draw(ctx);
         }

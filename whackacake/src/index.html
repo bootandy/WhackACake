@@ -6,18 +6,23 @@
 </head>
 
 <body onload="whackacake.init()">
-<span id='game_score' >0</span>
+<div id='game_score' style='location:absolute; :400; ' >0</div>
 
-<canvas id="cake_stack" width="100" height="300" style="border: 1px solid black;" >
+<canvas id="cake_stack"  style="border: 1px solid black;padding: 0px; margin: 0px;" >
 </canvas>
 
-<canvas id="c" width="300" height="300" style="border: 1px solid black;">
+<canvas id="c"  style="border: 1px solid black;padding: 0px; margin: 0px;">
     <p>
         sorry you need a modern browser
     </p>
 </canvas>
+
+<div id="frame_div">
 Frames: <span id='frames' >0</span>
+</div>
+<div id="cake_div">
 Cakes: <span id='cakes' >0</span>
+</div>
 
 </body>
 </html>
