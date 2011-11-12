@@ -104,7 +104,12 @@ var whackacake = function all() {
        }
         		
         this.mouseDown = function(e) {
-        	$this.canvasPressed(e.offsetX,e.offsetY);
+            var mouseX = e.pageX;
+            var mouseY = e.pageY;
+            mouseX -= my.canvas.offsetLeft;
+            mouseY -= my.canvas.offsetTop;
+
+        	$this.canvasPressed(mouseX, mouseY);
         }
         
         this.touchDown = function(e) {
