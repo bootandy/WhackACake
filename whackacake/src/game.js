@@ -57,7 +57,7 @@ var whackacake = function all() {
         this.canvasClicked = function(e) {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.x, e.y) && $this.cups[i].hasIngredient()) {
+                if ($this.cups[i].sprite.isClickedOn(e.pageX, e.pageY) && $this.cups[i].hasIngredient()) {
                     $this.score += $this.cups[i].hit()
                 }
             }
