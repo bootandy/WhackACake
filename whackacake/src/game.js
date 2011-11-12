@@ -37,7 +37,7 @@ var whackacake = function all() {
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.ctx = my.canvas.getContext('2d');
-            my.canvas.addEventListener('click', $this.checkClicks);
+            my.canvas.addEventListener('click', $this.canvasClicked);
         }
 
 
@@ -52,15 +52,12 @@ var whackacake = function all() {
         
         this.updateState = function(){
        		$this.cups[2].setIngredient($this.ingredients[0]); 
-       		$this.cups[2].setIngredientVisible(true);
         }
 
-        this.checkClicks = function(e) {
+        this.canvasClicked = function(e) {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
-                console.log("clicked");
                 if ($this.cups[i].sprite.isClickedOn(e.x, e.y)) {
-                    //alert(' hit! ' + i);
                     console.log("clicked on "+i);
                 }
             }
@@ -119,6 +116,10 @@ var whackacake = function all() {
     var Coords = function(xParam, yParam) {
         this.x = xParam;
         this.y = yParam;
+        
+        this.clone = function(){
+        	return new Coords(this.x, this.y);
+        }
     }
 
 
@@ -171,23 +172,23 @@ var whackacake = function all() {
     	var $this = this;
     	this.sprite = sprite;
     	this.ingredient = null;
-    	this.ingredientVisible = false;
     	
     	this.setIngredient = function(ingredient){
-    		ingredient.sprite.setXPos(this.sprite.coord.x);
-    		ingredient.sprite.setYPos(this.sprite.coord.y - 10);
+    		ingredient.sprite.coord = this.sprite.coord.clone();
     		$this.ingredient = ingredient;
     	}
     	
-    	this.setIngredientVisible = function(value){
-    		$this.ingredientVisible = value;
+    	this.updateState = function(){
+    		if(this.ingredient.isExpired()){
+    			this.ingredient = null;
+    		}
     	}
     	
     	this.draw = function(ctx){
-    		this.sprite.draw(ctx);
-    		if(this.ingredientVisible){
+	    	if(this.ingredient){
     			this.ingredient.draw(ctx);
     		}
+    		this.sprite.draw(ctx);		
     	}
 
     }
@@ -204,15 +205,24 @@ var whackacake = function all() {
     	var $this = this;
     	this.sprite = sprite;
     	this.visible = false;
-    	this.maxDisplayTime
-    	this.currentDisplayTime
+    	this.expiryTime = (2*1000.0)/my.game.loopInterval;
+    	
+    	this.isExpired = function(){
+    		if(this.expiryTime > 0 && my.frameCount - this.expiryTime > 0){
+    			return true;
+    		}
+    		return false;
+    	}
     	
     	this.draw = function(ctx){
-    		this.sprite.draw(ctx);
+    		if(!this.isExpired()){
+    			console.log("we expired");
+    			this.sprite.draw(ctx);
+    		}
     	}
     	
         this.setMaxDisplayTime = function(value){
-        	this.maxDisplayTime = value;
+            this.expiryTime = my.frameCount + value;
         }
     }
 
