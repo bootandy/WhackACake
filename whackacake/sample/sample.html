@@ -1,0 +1,283 @@
+<html>
+<body>
+<style type="text/css">
+body, a, a:hover {cursor: url(http://cur.cursors-4u.net/others/oth-5/oth438.cur),
+progress;}
+</style>
+<body background = "http://i52.tinypic.com/34e9ekj.jpg">
+<b><center><font size="5"><div id='counter'>0</div></font></center><b>
+<b><center><i>Whack-A-Mole</i> - by Steven</center></b>
+<div
+   style="
+      top: 37;
+      left: 350;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<center><img id='animation0' src ='http://i51.tinypic.com/sxheeo.gif'/></center>
+</div>
+<div
+   style="
+      top: 37;
+      left: 33;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<left><img id='animation1' src ='http://i51.tinypic.com/sxheeo.gif'/></left>
+</div>
+
+<div
+   style="
+      top: 37;
+      left: 700;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<right><img id='animation2' src ='http://i51.tinypic.com/sxheeo.gif'/></right>
+</div>
+<div
+   style="
+      top: 200;
+      left: 352;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation3' src ='http://i51.tinypic.com/sxheeo.gif'/>
+</div>
+<div
+   style="
+      top: 200;
+      left: 33;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation4' src ='http://i51.tinypic.com/sxheeo.gif'/>
+</div>
+<div
+   style="
+      top: 200;
+      left: 700;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation5' src ='http://i51.tinypic.com/sxheeo.gif'/>
+</div>
+<div
+   style="
+      top: 350;
+      left: 700;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation6' src ='http://i51.tinypic.com/sxheeo.gif'/>
+</div>
+<div
+   style="
+      top: 350;
+      left: 33;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation7' src ='http://i51.tinypic.com/sxheeo.gif'/>
+
+</div>
+<div
+   style="
+      top: 350;
+      left: 352;
+      position: absolute;
+      z-index: 1;
+      visibility: show;">
+<img id='animation8' src ='http://i51.tinypic.com/sxheeo.gif'/>
+</div>
+</body>
+<head>
+<script type="text/javascript">
+var urls;
+
+function animate0(pos) {
+    pos %= urls.length;
+    var animation0 = document.getElementById('animation0');
+    var counter = document.getElementById('counter');
+    animation0.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation0.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation0.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate0(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate1(pos) {
+    pos %= urls.length;
+    var animation1 = document.getElementById('animation1');
+    var counter = document.getElementById('counter');
+    animation1.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation1.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation1.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate1(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate2(pos) {
+    pos %= urls.length;
+    var animation2 = document.getElementById('animation2');
+    var counter = document.getElementById('counter');
+    animation2.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation2.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation2.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate2(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate3(pos) {
+    pos %= urls.length;
+    var animation3 = document.getElementById('animation3');
+    var counter = document.getElementById('counter');
+    animation3.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation3.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation3.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate3(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate4(pos) {
+    pos %= urls.length;
+    var animation4 = document.getElementById('animation4');
+    var counter = document.getElementById('counter');
+    animation4.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation4.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation4.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate4(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate5(pos) {
+    pos %= urls.length;
+    var animation5 = document.getElementById('animation5');
+    var counter = document.getElementById('counter');
+    animation5.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation5.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation5.onclick = function() {
+            //do nothing onclick
+        }
+    }
+    setTimeout(function() {
+        animate5(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate6(pos) {
+    pos %= urls.length;
+    var animation6 = document.getElementById('animation6');
+    var counter = document.getElementById('counter');
+    animation6.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation6.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation6.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate6(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate7(pos) {
+    pos %= urls.length;
+    var animation7 = document.getElementById('animation7');
+    var counter = document.getElementById('counter');
+    animation7.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation7.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation7.onclick = function() {
+            //do nothing
+        }
+    }
+    setTimeout(function() {
+        animate7(++pos);
+    }, (Math.random()*500) + 1000);
+}
+function animate8(pos) {
+    pos %= urls.length;
+    var animation8 = document.getElementById('animation8');
+    var counter = document.getElementById('counter');
+    animation8.src = urls[pos];
+    if (pos == 1) { // only make onclick when have a certain image
+        animation8.onclick = function() {
+            counter.innerHTML = parseInt(counter.innerHTML) + 1;
+        }
+    }
+    else {
+        animation8.onclick = function() {
+            //do nothing
+        }
+    }
+       setTimeout(function() {
+        animate8(++pos);
+    }, (Math.random()*500) + 1000);
+}
+window.onload = function() { //Frames go below, seperated by commas format= , "URL");
+    urls = new Array("http://i51.tinypic.com/sxheeo.gif", "http://i56.tinypic.com/2i3tyw.gif");
+    animate0(0);
+    animate1(0);
+    animate2(0);
+    animate3(0);
+    animate4(0);
+    animate5(0);
+    animate6(0);
+    animate7(0);
+    animate8(0);
+}
+</script>
+</head>
+</html>
