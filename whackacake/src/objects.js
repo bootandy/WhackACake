@@ -127,20 +127,34 @@ objects = function(gameobj){
 
     }
 
-    gameobj.TransAnimation = function(startCoord, endCoord, duration){
+    gameobj.TransAnimation = function(startCoord, endCoord, duration, interpolator){
         var $this = this;
         this.startCoord = startCoord;
         this.endCoord = endCoord;
         this.diff = endCoord.difference(startCoord);
         this.duration = duration;
-        console.log("start time is: " + gameobj.frameCount);
-        console.log("duration is: " + this.duration);
-        this.startTime = gameobj.frameCount
+        this.startTime = 0;
+        if(typeof(interpolator) == 'undefined'){
+            this.interpolator = function(currentTime, duration){return currentTime/duration;}
+        }else{
+            this.interpolator = interpolator;
+        }
+
+        /**
+         * Starts the animation at the current time unless start time is passed in,
+         * in which case the animation is started at startTime.
+         */
+        this.start = function(startTime){
+            if(typeof(startTime) == 'undefined'){
+                this.startTime = gameobj.frameCount;
+            }
+            else $this.startTime = startTime;
+        }
 
         this.getLocation = function(){
             currentDuration = gameobj.frameCount - $this.startTime
-            newX = startCoord.x + ($this.diff.x/$this.duration)*currentDuration;
-            newY = startCoord.y + ($this.diff.y/$this.duration)*currentDuration;
+            newX = startCoord.x + $this.diff.x * $this.interpolator(currentDuration, $this.duration); //($this.diff.x/$this.duration)*currentDuration;
+            newY = startCoord.y + $this.diff.y * $this.interpolator(currentDuration, $this.duration); //($this.diff.y/$this.duration)*currentDuration;
             return new gameobj.Coords(newX, newY);
         }
 
@@ -151,9 +165,59 @@ objects = function(gameobj){
 
 
     /**
-     * Takes a list of animations and repeats them in order.
+     * Takes an array of animations and executes them in order,
+     * every animation must have a positive duration property.
      */
-    gameobj.RepeatingAnimation = function(animations){
+    gameobj.AnimationCollection = function(animations){
+        var $this = this;
+        this.animations = animations;
+        this.startTime = 0;
+
+        this.start = function(startTime){
+            $this.activeIndex = 0;
+            $this.animations[$this.activeIndex].start(startTime);
+        }
+
+        this.hasFinished = function(){
+            var currentDuration = gameobj.frameCount - $this.startTime;
+            if($this.activeIndex == $this.animations.length - 1
+                    && $this.animations[$this.activeIndex].hasFinished()){
+                return true;
+            } 
+            return false;
+        }
+
+        this.getLocation = function(){
+            if($this.activeIndex == $this.animations.length - 1){
+                return $this.animations[$this.activeIndex].getLocation();
+            }
+            if($this.animations[$this.activeIndex].hasFinished()){
+                $this.activeIndex += 1;
+                //Add one loopinterval to starttime because we are behind by one timestep
+                $this.animations[$this.activeIndex].start()//.start(gameobj.frameCount + gameobj.game.loopInterval);
+            } 
+            return $this.animations[$this.activeIndex].getLocation();
+        }
+    }
+
+
+    /**
+     * Takes an animation and repeats i indefinitely.
+     */
+    gameobj.RepeatingAnimation = function(animation){
+        var $this = this;
+        $this.animation = animation;
+
+        this.start = function(startTime){
+            $this.animation.start(startTime);
+        }
+
+        this.getLocation = function(){
+            if($this.animation.hasFinished()){
+                $this.animation.start(gameobj.frameCount + gameobj.game.loopInterval);
+            }
+            return $this.animation.getLocation();
+        }
     }
     
     
@@ -170,13 +234,19 @@ objects = function(gameobj){
     	this.ingredient = null;
     	
     	this.setIngredient = function(ingredient){
-    		ingredient.sprite.coord = this.sprite.coord.clone();
-            ingredient.sprite.animation = new gameobj.TransAnimation($this.sprite.coord, 
-                                                             $this.sprite.coord.add(new gameobj.Coords(0, -10)),
-                                                             gameobj.getDurationInFrames(500));
-    		ingredient.sprite.coord = $this.sprite.coord.clone();
-    		$this.ingredient = ingredient;
+            ingredient.setAnimation($this.getIngredientAnimation());
+            $this.ingredient = ingredient;
     	}
+
+        this.getIngredientAnimation = function(){
+            var interpolator = function(currentTime, duration){return Math.pow(currentTime/duration, 3);};
+            var startPoint = $this.sprite.coord.clone();
+            var endPoint = $this.sprite.coord.add(new gameobj.Coords(0, -10));
+            var duration = gameobj.getDurationInFrames(250);
+            var upAnimation = new gameobj.TransAnimation(startPoint, endPoint, duration, interpolator);
+            var downAnimation = new gameobj.TransAnimation(endPoint, startPoint, duration, interpolator);
+            return new gameobj.AnimationCollection([upAnimation, downAnimation]);
+        }
     	
     	this.updateState = function(){
     		if($this.ingredient && $this.ingredient.isExpired()){
@@ -223,6 +293,11 @@ objects = function(gameobj){
     			this.sprite.draw(ctx);
     		}
     	}
+
+        this.setAnimation = function(animation){
+            $this.sprite.animation = animation;
+            $this.sprite.animation.start();
+        }
     	
         this.setMaxDisplayTime = function(value){
             this.expiryTime = gameobj.frameCount + value;
