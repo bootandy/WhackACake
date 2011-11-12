@@ -21,6 +21,13 @@ var whackacake = function all() {
         my.game.loop();
     }
 
+    /**
+     * Returns the number of frames required for a delay of a given time
+     */
+    my.getDurationInFrames = function(milliseconds){
+        return milliseconds * my.game.loopInterval;
+    }
+
 
     ///---------------- objects ----------------
 
@@ -76,7 +83,8 @@ var whackacake = function all() {
             var screenHeight = my.canvas.height;
             
             var result = [];
-        	result.push(new Ingredient(new Sprite(null, null, $this.images.choc)));
+        	var ingredient = new Ingredient(new Sprite(null, null, $this.images.choc));
+            result.push(ingredient);
         	return result;
         }
         
@@ -121,6 +129,20 @@ var whackacake = function all() {
         this.clone = function(){
         	return new Coords(this.x, this.y);
         }
+
+        /**
+         *returns the vector difference between this coord and other.
+         */
+        this.difference = function(other){
+            return new Coords(this.x - other.x, this.y - other.y);
+        }
+
+        /**
+         * Returns vector sum of this coord with other
+         */
+        this.add = function(other){
+            return new Coords(other.x + this.x, other.y + this.y);
+        }
     }
 
 
@@ -132,8 +154,19 @@ var whackacake = function all() {
         this.width = 40;
         this.height = 40;
         this.spriteImage = spriteImage;
+        this.animation = null;
 
         this.draw = function(ctx) {
+            var xPos = 0;
+            var yPos = 0;
+            if(this.animation){
+                drawCoord = this.animation.getLocation();
+                this.coord.x = drawCoord.x;
+                this.coord.y = drawCoord.y;
+                if(this.animation.hasFinished()){
+                    this.animation = null;
+                }
+            }
             ctx.drawImage(this.spriteImage,
                     this.coord.x - this.width,
                     this.coord.y - this.height,
@@ -142,13 +175,6 @@ var whackacake = function all() {
             );
         }
         
-        this.setXPos = function(value) {
-        	this.coord.x = value;
-        }
-        
-        this.setYPos = function(value) {
-        	this.coord.y = value;
-        }
 
         this.isClickedOn = function(x, y) {
             if (( this.coord.x - this.width < x && this.coord.x + this.width > x )
@@ -159,6 +185,26 @@ var whackacake = function all() {
         }
         
 
+    }
+
+    var TransAnimation = function(startCoord, endCoord, duration){
+        var $this = this;
+        this.startCoord = startCoord;
+        this.endCoord = endCoord;
+        this.diff = endCoord.difference(startCoord);
+        this.duration = duration;
+        this.startTime = my.frameCount
+
+        this.getLocation = function(){
+            currentDuration = my.frameCount - $this.startTime
+            newX = startCoord.x + ($this.diff.x/$this.duration)*currentDuration;
+            newY = startCoord.y + ($this.diff.y/$this.duration)*currentDuration;
+            return new Coords(newX, newY);
+        }
+
+        this.hasFinished = function(){
+            return ($this.startTime + $this.duration) < my.frameCount;
+        }
     }
     
     
@@ -176,6 +222,9 @@ var whackacake = function all() {
     	
     	this.setIngredient = function(ingredient){
     		ingredient.sprite.coord = this.sprite.coord.clone();
+            ingredient.sprite.animation = new TransAnimation($this.sprite.coord, 
+                                                             $this.sprite.coord.add(new Coords(10, 0)),
+                                                             1500);
     		$this.ingredient = ingredient;
     	}
     	
@@ -228,7 +277,6 @@ var whackacake = function all() {
     	
     	this.draw = function(ctx){
     		if(!this.isExpired()){
-    			console.log("we expired");
     			this.sprite.draw(ctx);
     		}
     	}
