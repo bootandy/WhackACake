@@ -1,4 +1,4 @@
-var foo=0;
+var foo=true;
 
 objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
@@ -72,11 +72,11 @@ objects = function(gameobj){
     }
     
     gameobj.SpriteAtXYFromImage = function(x, y, spriteImage) {
-        return new gameobj.Sprite(x, y, spriteImage.width, spriteImage.height, spriteImage, 0, 0, null, null);
+        return new gameobj.Sprite(x, y, spriteImage.width, spriteImage.height, spriteImage, null, null, null, null);
     }
     
     gameobj.SpriteAtXYWithWidthHeightFromImage = function(x, y, width, height, spriteImage) {
-        return new gameobj.Sprite(x, y, width, height, spriteImage, 0, 0, null, null);
+        return new gameobj.Sprite(x, y, width, height, spriteImage, null, null, null, null);
     }
 
     gameobj.Sprite = function(x, y, width, height, spriteImage, img_x, img_y, img_width, img_height) {
@@ -104,6 +104,10 @@ objects = function(gameobj){
             }
 
             if (this.img_coords.x != null && this.img_coords.y != null) {
+                if (foo) {
+                    foo=false;
+                    console.log(this)
+                }
                 ctx.drawImage(this.spriteImage,
                             this.img_coords.x, this.img_coords.y, this.img_width, this.img_height,
                             this.coord.x-this.width/2,
