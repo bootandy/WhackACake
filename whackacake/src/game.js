@@ -18,6 +18,7 @@ var whackacake = function all() {
         my.canvas_cake_stack.height = screenHeight;
         my.canvas_cake_stack.width = cakeStackWidth;
 
+
         console.debug("canvas: " + style);
 
         my.game = new Game();
@@ -40,6 +41,7 @@ var whackacake = function all() {
             $this.cups = this.createCups();
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
+            $this.frameDisplay = document.getElementById("frames");
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
             my.canvas.addEventListener('click', $this.canvasClicked);
@@ -48,43 +50,42 @@ var whackacake = function all() {
 
         //Main game loop
         this.loop = function() {
-			my.frameCount++;
-            $this.score++;
+            my.frameCount++;
             $this.updateState();
             $this.drawAll();
             setTimeout("whackacake.game.loop()", $this.loopInterval);
         }
 
-        this.updateState = function(){
-       		$this.cups[2].setIngredient($this.ingredients[0]);
+        this.updateState = function() {
+            $this.cups[2].setIngredient($this.ingredients[0]);
         }
 
         this.canvasClicked = function(e) {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.x, e.y)) {
-                    console.log("clicked on "+i);
+                if ($this.cups[i].sprite.isClickedOn(e.pageX, e.pageY) && $this.cups[i].hasIngredient()) {
+                    $this.score += $this.cups[i].hit()
                 }
             }
         }
 
-        this.loadImages = function(){
+        this.loadImages = function() {
             $this.images.cup = new Image();
             $this.images.cup.src = "images/cup.jpeg";
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
-            $this.images.cakeLayers= new Image();
+            $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
         }
 
 
-        this.createIngredients = function(){
-        	var screenWidth = my.canvas.width;
+        this.createIngredients = function() {
+            var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
 
             var result = [];
-        	result.push(new Ingredient(new Sprite(null, null, $this.images.choc)));
-        	return result;
+            result.push(new Ingredient(new Sprite(null, null, $this.images.choc)));
+            return result;
         }
 
 
@@ -102,20 +103,20 @@ var whackacake = function all() {
             result.push(new Cup(new Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
             console.log(result);
             return result;
-        };
+        }
 
 
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
 
-            this.scoreDisplay.innerHTML = my.frameCount;
+            this.scoreDisplay.innerHTML = $this.score;
+            this.frameDisplay.innerHTML = my.frameCount;
             //this.ctx.fillStyle = "rgb(200,0,0)";
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
-
             }
             for (i = 0; i < 10; i++) {
                 $this.addAndDrawCakeStack(i, i);
@@ -133,7 +134,7 @@ var whackacake = function all() {
             var y = my.canvas_cake_stack.height - 100;
             y = y - cakeLayerHeightOverlay * stackLayer;
 
-            $this.ctx_cake_stack.drawImage( $this.images.cakeLayers,
+            $this.ctx_cake_stack.drawImage($this.images.cakeLayers,
                     0, cakeLayerSourceHeight * ingredientIndex, cakeLayerSourceWidth, cakeLayerSourceHeight,
                     x, y, 100, cakeLayerHeight);
 
@@ -149,12 +150,10 @@ var whackacake = function all() {
         this.x = xParam;
         this.y = yParam;
 
-        this.clone = function(){
-        	return new Coords(this.x, this.y);
+        this.clone = function() {
+            return new Coords(this.x, this.y);
         }
     }
-
-
 
 
     var Sprite = function(x, y, spriteImage) {
@@ -174,11 +173,11 @@ var whackacake = function all() {
         }
 
         this.setXPos = function(value) {
-        	this.coord.x = value;
+            this.coord.x = value;
         }
 
         this.setYPos = function(value) {
-        	this.coord.y = value;
+            this.coord.y = value;
         }
 
         this.isClickedOn = function(x, y) {
@@ -193,68 +192,86 @@ var whackacake = function all() {
     }
 
 
-
     /**
- 	 *
- 	 *	The cup object, holds a sprite for the rendering of the cup
- 	 *	and an ingredient to draw
- 	 *
- 	 **/
-    var Cup = function(sprite){
-    	var $this = this;
-    	this.sprite = sprite;
-    	this.ingredient = null;
+     *
+     *    The cup object, holds a sprite for the rendering of the cup
+     *    and an ingredient to draw
+     *
+     **/
+    var Cup = function(sprite) {
+        var $this = this;
+        this.sprite = sprite;
+        this.ingredient = null;
 
-    	this.setIngredient = function(ingredient){
-    		ingredient.sprite.coord = this.sprite.coord.clone();
-    		$this.ingredient = ingredient;
-    	}
+        this.setIngredient = function(ingredient) {
+            ingredient.sprite.coord = this.sprite.coord.clone();
+            $this.ingredient = ingredient;
+        }
 
-    	this.updateState = function(){
-    		if(this.ingredient.isExpired()){
-    			this.ingredient = null;
-    		}
-    	}
+        this.updateState = function() {
+            if (this.ingredient.isExpired()) {
+                this.ingredient = null;
+            }
+        }
 
-    	this.draw = function(ctx){
-	    	if(this.ingredient){
-    			this.ingredient.draw(ctx);
-    		}
-    		this.sprite.draw(ctx);
-    	}
+        this.draw = function(ctx) {
+            this.sprite.draw(ctx);
+            if (this.ingredient) {
+                this.ingredient.draw(ctx);
+            }
+        }
+
+        this.hit = function() {
+            score = this.ingredient.getScore();
+            this.ingredient.hit();
+            return score;
+        }
+
+        this.hasIngredient = function() {
+            return this.ingredient;
+        }
 
     }
 
 
-
     /**
- 	 *
- 	 *	The cup object, holds a sprite for the rendering of the cup
- 	 *	and an ingredient to draw
- 	 *
- 	 **/
-    var Ingredient = function(sprite){
-    	var $this = this;
-    	this.sprite = sprite;
-    	this.visible = false;
-    	this.expiryTime = (2*1000.0)/my.game.loopInterval;
+     *
+     *    The cup object, holds a sprite for the rendering of the cup
+     *    and an ingredient to draw
+     *
+     **/
+    var Ingredient = function(sprite) {
+        var $this = this;
+        this.sprite = sprite;
+        this.visible = false;
+        this.expiryTime = (2 * 1000.0) / my.game.loopInterval;
+        this.wasHit = false;
 
-    	this.isExpired = function(){
-    		if(this.expiryTime > 0 && my.frameCount - this.expiryTime > 0){
-    			return true;
-    		}
-    		return false;
-    	}
+        this.isExpired = function() {
+            if (this.wasHit || (this.expiryTime > 0 && my.frameCount - this.expiryTime > 0)) {
+                return true;
+            }
+            return false;
+        }
 
-    	this.draw = function(ctx){
-    		if(!this.isExpired()){
-    			console.log("we expired");
-    			this.sprite.draw(ctx);
-    		}
-    	}
+        this.draw = function(ctx) {
+            if (!this.isExpired()) {
+                console.log("we expired");
+                this.sprite.draw(ctx);
+            }
+        }
 
-        this.setMaxDisplayTime = function(value){
+        this.setMaxDisplayTime = function(value) {
             this.expiryTime = my.frameCount + value;
+        }
+
+        this.getScore = function() {
+            // TODO
+            return 5;
+        }
+
+        this.hit = function() {
+            this.wasHit = true;
         }
     }
 
