@@ -74,7 +74,8 @@ var whackacake = function all() {
             $this.frameDisplay = document.getElementById("frames");
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-            my.canvas.addEventListener('click', $this.canvasClicked);
+            my.canvas.addEventListener('click', $this.canvasClicked, false);
+            my.canvas.addEventListener('onclick', 'alert ("hi");', false);
         }
 
 
