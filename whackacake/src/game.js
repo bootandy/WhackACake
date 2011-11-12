@@ -73,6 +73,8 @@ var whackacake = function all() {
             $this.images.cup.src = "images/cup.jpeg";
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
+            $this.images.cakeLayers= new Image();
+            $this.images.cakeLayers.src = "images/cake_layers.png";
         }
 
 
@@ -113,22 +115,30 @@ var whackacake = function all() {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
-                $this.addAndDrawCakeStack(i);
+
+            }
+            for (i = 0; i < 10; i++) {
+                $this.addAndDrawCakeStack(i, i);
             }
 
         }
 
-        this.addAndDrawCakeStack = function(stackLayer) {
-            var x = 10;
-            var y = my.canvas_cake_stack.height - 100;
-            y = y - 40 * stackLayer;
+        this.addAndDrawCakeStack = function(stackLayer, ingredientIndex) {
+            var x = 0;
+            var cakeLayerHeight = 50;
+            var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
+            var cakeLayerSourceHeight = 154;
+            var cakeLayerSourceWidth = 300;
 
-            $this.ctx_cake_stack.drawImage($this.images.choc,
-                    x,
-                    y,
-                    80,
-                    60 );
+            var y = my.canvas_cake_stack.height - 100;
+            y = y - cakeLayerHeightOverlay * stackLayer;
+
+            $this.ctx_cake_stack.drawImage( $this.images.cakeLayers,
+                    0, cakeLayerSourceHeight * ingredientIndex, cakeLayerSourceWidth, cakeLayerSourceHeight,
+                    x, y, 100, cakeLayerHeight);
+
         }
+
         this.cleanCakeStack = function() {
             $this.ctx_cake_stack.clearRect(0, 0, my.ctx_cake_stack.width, my.ctx_cake_stack.height);
         }
