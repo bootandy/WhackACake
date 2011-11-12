@@ -51,6 +51,7 @@ var whackacake = function all() {
         }
         
         this.updateState = function(){
+
        		$this.cups[2].setIngredient($this.ingredients[0]); 
        		$this.cups[2].setIngredientVisible(true);
         }
