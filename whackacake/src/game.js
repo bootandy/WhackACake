@@ -59,7 +59,12 @@ var whackacake = function all() {
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.ctx = my.canvas.getContext('2d');
-            my.canvas.addEventListener('click', $this.canvasClicked);
+            my.canvas.addEventListener('click', $this.mouseDown);
+            my.canvas.addEventListener("touchstart", $this.touchDown, false);
+            my.canvas.addEventListener("touchmove", $this.touchMove, true);
+            my.canvas.addEventListener("touchend", $this.touchUp, false);
+            my.canvas.addEventListener("touchcancel", $this.touchUp, false);
+            
         }
 
 
@@ -84,14 +89,38 @@ var whackacake = function all() {
 			$this.cups.forEach(function(c) { c.updateState(); });
         }
 
-        this.canvasClicked = function(e) {
-            var i;
-            for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.pageX, e.pageY) && $this.cups[i].hasIngredient()) {
-                    $this.score += $this.cups[i].hit()
-                }
-            }
+ 		
+        this.mouseDown = function(e) {
+
+        	$this.canvasPressed(e.pageX,e.pageY);
         }
+        
+        console.log("touchDown");
+        this.touchDown = function(e) {
+          if (!e) var e = event;
+          e.preventDefault();
+          touchX = e.targetTouches[0].pageX - my.canvas.offsetLeft;
+          touchY = e.targetTouches[0].pageY - my.canvas.offsetTop;
+          
+          $this.canvasPressed(touchX,touchY);
+        }
+        
+       /** 
+       This function determines which sprite was clicked
+       and takes relevant action. The x,y parameters are passed by
+       touchDown or mouseDown functions.
+       **/
+       
+        this.canvasPressed = function(x,y) {        
+        	var i;
+        	for (i = 0; i < $this.cups.length; i++) {
+        	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
+        	        $this.score += $this.cups[i].hit()
+        	    }
+        	}
+        }
+        
+ 
 
         this.loadImages = function(){
             $this.images.cup = new Image();
