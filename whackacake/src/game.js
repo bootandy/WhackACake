@@ -146,14 +146,19 @@ var whackacake = function all() {
         }
 
         this.loadImages = function() {
-            $this.images.cup = new Image();
-            $this.images.cup.src = "images/cup.jpeg";
+            var addImage = function(im_name, src, width, height) {
+                $this.images[im_name] = new Image()
+                $this.images[im_name].src = src
+                $this.images[im_name].width = width
+                $this.images[im_name].height = height
+            }
+            addImage("cup", "images/cup.jpeg", 50, 50);
+            addImage("ingredients", "images/ingredients.png", 50, 50);
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
-            $this.images.ingredients = new Image;
-            $this.images.ingredients.src = "images/ingredients.png"
+
         }
 
 
