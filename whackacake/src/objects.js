@@ -1,3 +1,5 @@
+var foo=0;
+
 objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
@@ -83,8 +85,8 @@ objects = function(gameobj){
         this.img_coords = new gameobj.Coords(img_x, img_y);
         this.width = width;
         this.height = height;
-        this.image_width = width;
-        this.image_height = height;
+        this.img_width = img_width;
+        this.img_height = img_height;
         this.spriteImage = spriteImage;
         this.animation = null;
 
@@ -100,9 +102,10 @@ objects = function(gameobj){
                     console.log("finished");
                 }
             }
-            if (this.img_coords.x && this.img_coords.y) {
+
+            if (this.img_coords.x != null && this.img_coords.y != null) {
                 ctx.drawImage(this.spriteImage,
-                            this.img_coords.x, this.img_coords.y, this.image_width, this.image_height,
+                            this.img_coords.x, this.img_coords.y, this.img_width, this.img_height,
                             this.coord.x-this.width/2,
                             this.coord.y-this.height/2,
                             this.width,
@@ -204,9 +207,10 @@ objects = function(gameobj){
     }
 
 
-    gameobj.Ingredient = function(sprite){
+    gameobj.Ingredient = function(type_no){
     	var $this = this;
-    	this.sprite = sprite;
+    	this.type_no = type_no
+    	this.sprite = new gameobj.Sprite(null, null, 50, 50, gameobj.game.images.ingredients, 0, type_no*160, 212, 160);
     	this.visible = false;
     	this.expiryTime = gameobj.frameCount + (2*1000.0)/gameobj.game.loopInterval;
     	this.wasHit = false;
@@ -238,7 +242,7 @@ objects = function(gameobj){
         }
 
         this.getType = function() {
-            return 0;
+            return type_no;
         }
     }
 

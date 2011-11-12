@@ -97,7 +97,7 @@ var whackacake = function all() {
             if (Math.random() < $this.spawnProbability) {
                 var cup = $this.getRandomCup()
                 if (!cup.hasIngredient()) {
-       	   	         cup.setIngredient(new my.Ingredient(new my.SpriteFromWidthHeightAndImage(50, 50, $this.images.choc))); // Choose a random ingredient
+       	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
        	   	    }
        		}
 			$this.cups.forEach(function(c) { c.updateState(); });
@@ -152,6 +152,8 @@ var whackacake = function all() {
             $this.images.choc.src = "images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
+            $this.images.ingredients = new Image;
+            $this.images.ingredients.src = "images/ingredients.png"
         }
 
 
@@ -186,6 +188,10 @@ var whackacake = function all() {
         this.getRandomCup = function() {
           cup_idx = Math.floor(Math.random()*$this.cups.length)
           return $this.cups[cup_idx];
+        }
+        
+        this.getRandomIngredient = function() {
+          return new my.Ingredient(Math.floor(Math.random()*10));
         }
 
         this.drawAll = function() {
