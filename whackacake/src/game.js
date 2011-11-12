@@ -91,7 +91,7 @@ var whackacake = function all() {
             if (Math.random() < $this.spawnProbability) {
                 var cup = $this.getRandomCup()
                 if (!cup.hasIngredient()) {
-       	   	         cup.setIngredient(new Ingredient(new Sprite(null, null, $this.images.choc))); // Choose a random ingredient
+       	   	         cup.setIngredient(new Ingredient(new SpriteFromWidthHeightAndImage(50, 50, $this.images.choc))); // Choose a random ingredient
        	   	    }
        		}
 			$this.cups.forEach(function(c) { c.updateState(); });
@@ -128,7 +128,7 @@ var whackacake = function all() {
             var screenHeight = my.canvas.height;
 
             var result = [];
-        	var ingredient = new Ingredient(new Sprite(null, null, $this.images.choc));
+        	var ingredient = new Ingredient(new SpriteFromWidthHeightAndImage($this.images.choc));
             result.push(ingredient);
         	return result;
 
@@ -142,11 +142,11 @@ var whackacake = function all() {
             console.log('here');
 
             var result = new Array;
-            result.push(new Cup(new Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup)));
-            result.push(new Cup(new Sprite(3 * screenWidth / 4, screenHeight / 4, $this.images.cup)));
-            result.push(new Cup(new Sprite(screenWidth / 2, screenHeight / 2, $this.images.cup)));
-            result.push(new Cup(new Sprite(screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
-            result.push(new Cup(new Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
+            result.push(new Cup(new SpriteAtXYWithWidthHeightFromImage (screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
+            result.push(new Cup(new SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
+            result.push(new Cup(new SpriteAtXYWithWidthHeightFromImage(screenWidth / 2, screenHeight / 2, 50, 50, $this.images.cup)));
+            result.push(new Cup(new SpriteAtXYWithWidthHeightFromImage(screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
+            result.push(new Cup(new SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
             console.log(result);
             return result;
         }
@@ -233,12 +233,31 @@ var whackacake = function all() {
         }
     }
 
+    // Named Sprite constructors
+    var SpriteFromImage = function(spriteImage) {
+        return new Sprite(null, null, spriteImage.width, spriteImage.height, spriteImage, 0, 0, null, null)
+    }
+    
+    var SpriteFromWidthHeightAndImage = function(width, height, spriteImage) {
+        return new Sprite(null, null, width, height, spriteImage);
+    }
+    
+    var SpriteAtXYFromImage = function(x, y, spriteImage) {
+        return new Sprite(x, y, spriteImage.width, spriteImage.height, spriteImage, 0, 0, null, null);
+    }
+    
+    var SpriteAtXYWithWidthHeightFromImage = function(x, y, width, height, spriteImage) {
+        return new Sprite(x, y, width, height, spriteImage, 0, 0, null, null);
+    }
 
-    var Sprite = function(x, y, spriteImage) {
+    var Sprite = function(x, y, width, height, spriteImage, img_x, img_y, img_width, img_height) {
         var $this = this;
         this.coord = new Coords(x, y);
-        this.width = 40;
-        this.height = 40;
+        this.img_coords = new Coords(img_x, img_y);
+        this.width = width;
+        this.height = height;
+        this.image_width = width;
+        this.image_height = height;
         this.spriteImage = spriteImage;
         this.animation = null;
 
@@ -254,12 +273,20 @@ var whackacake = function all() {
                     console.log("finished");
                 }
             }
-            ctx.drawImage(this.spriteImage,
-                    this.coord.x - this.width,
-                    this.coord.y - this.height,
-                    this.width * 2,
-                    this.height * 2
-            );
+            if (this.img_coords.x && this.img_coords.y) {
+                ctx.drawImage(this.spriteImage,
+                            this.img_coords.x, this.img_coords.y, this.image_width, this.image_height,
+                            this.coord.x-this.width/2,
+                            this.coord.y-this.height/2,
+                            this.width,
+                            this.height);
+            } else {
+                ctx.drawImage(this.spriteImage,
+                        this.coord.x - this.width/2,
+                        this.coord.y - this.height/2,
+                        this.width,
+                        this.height);
+            }
         }
 
         this.isClickedOn = function(x, y) {
