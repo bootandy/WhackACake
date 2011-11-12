@@ -4,19 +4,15 @@ var whackacake = function all() {
 
     my.init = function() {
         my.canvas = document.getElementById("c");
-        my.canvas_cake_stack = document.getElementById("cake_stack");
-        var screenWidth = 500;
+        var screenWidth = 600;
         var screenHeight = 400;
-        var cakeStackWidth = 100;
 
         var style = my.canvas.getAttribute("style");
         my.canvas.setAttribute("style", style + "; height:" + screenHeight + "; width:" + screenWidth + ";");
-        my.canvas_cake_stack.setAttribute("style", style + "; height:" + screenHeight + "; width:" + cakeStackWidth + ";");
 
         my.canvas.height = screenHeight;
         my.canvas.width = screenWidth;
-        my.canvas_cake_stack.height = screenHeight;
-        my.canvas_cake_stack.width = cakeStackWidth;
+
 
         console.debug("canvas: " + style);
 
@@ -41,7 +37,6 @@ var whackacake = function all() {
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.ctx = my.canvas.getContext('2d');
-            $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
             my.canvas.addEventListener('click', $this.canvasClicked);
         }
 
@@ -54,9 +49,9 @@ var whackacake = function all() {
             $this.drawAll();
             setTimeout("whackacake.game.loop()", $this.loopInterval);
         }
-
+        
         this.updateState = function(){
-       		$this.cups[2].setIngredient($this.ingredients[0]);
+       		$this.cups[2].setIngredient($this.ingredients[0]); 
         }
 
         this.canvasClicked = function(e) {
@@ -75,22 +70,22 @@ var whackacake = function all() {
             $this.images.choc.src = "images/chocolate.jpg";
         }
 
-
+        
         this.createIngredients = function(){
         	var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
-
+            
             var result = [];
         	result.push(new Ingredient(new Sprite(null, null, $this.images.choc)));
         	return result;
         }
-
+        
 
         this.createCups = function() {
             var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
 
-            console.log('here');
+			console.log('here');
 
             var result = [];
             result.push(new Cup(new Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup)));
@@ -100,7 +95,7 @@ var whackacake = function all() {
             result.push(new Cup(new Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
             console.log(result);
             return result;
-        };
+        }
 
 
         this.drawAll = function() {
@@ -113,24 +108,7 @@ var whackacake = function all() {
             var i;
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
-                $this.addAndDrawCakeStack(i);
             }
-
-        }
-
-        this.addAndDrawCakeStack = function(stackLayer) {
-            var x = 10;
-            var y = my.canvas_cake_stack.height - 100;
-            y = y - 40 * stackLayer;
-
-            $this.ctx_cake_stack.drawImage($this.images.choc,
-                    x,
-                    y,
-                    80,
-                    60 );
-        }
-        this.cleanCakeStack = function() {
-            $this.ctx_cake_stack.clearRect(0, 0, my.ctx_cake_stack.width, my.ctx_cake_stack.height);
         }
 
     }
@@ -138,7 +116,7 @@ var whackacake = function all() {
     var Coords = function(xParam, yParam) {
         this.x = xParam;
         this.y = yParam;
-
+        
         this.clone = function(){
         	return new Coords(this.x, this.y);
         }
@@ -162,11 +140,11 @@ var whackacake = function all() {
                     this.height * 2
             );
         }
-
+        
         this.setXPos = function(value) {
         	this.coord.x = value;
         }
-
+        
         this.setYPos = function(value) {
         	this.coord.y = value;
         }
@@ -178,12 +156,12 @@ var whackacake = function all() {
             }
             return false;
         }
-
+        
 
     }
-
-
-
+    
+    
+    
     /**
  	 *
  	 *	The cup object, holds a sprite for the rendering of the cup
@@ -194,29 +172,29 @@ var whackacake = function all() {
     	var $this = this;
     	this.sprite = sprite;
     	this.ingredient = null;
-
+    	
     	this.setIngredient = function(ingredient){
     		ingredient.sprite.coord = this.sprite.coord.clone();
     		$this.ingredient = ingredient;
     	}
-
+    	
     	this.updateState = function(){
     		if(this.ingredient.isExpired()){
     			this.ingredient = null;
     		}
     	}
-
+    	
     	this.draw = function(ctx){
-	    	if(this.ingredient){
+    		this.sprite.draw(ctx);
+    		if(this.ingredient){
     			this.ingredient.draw(ctx);
     		}
-    		this.sprite.draw(ctx);
     	}
 
     }
-
-
-
+    
+    
+    
     /**
  	 *
  	 *	The cup object, holds a sprite for the rendering of the cup
@@ -228,21 +206,21 @@ var whackacake = function all() {
     	this.sprite = sprite;
     	this.visible = false;
     	this.expiryTime = (2*1000.0)/my.game.loopInterval;
-
+    	
     	this.isExpired = function(){
     		if(this.expiryTime > 0 && my.frameCount - this.expiryTime > 0){
     			return true;
     		}
     		return false;
     	}
-
+    	
     	this.draw = function(ctx){
     		if(!this.isExpired()){
     			console.log("we expired");
     			this.sprite.draw(ctx);
     		}
     	}
-
+    	
         this.setMaxDisplayTime = function(value){
             this.expiryTime = my.frameCount + value;
         }
