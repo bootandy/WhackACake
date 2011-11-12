@@ -50,7 +50,7 @@ var whackacake = function all() {
      * Returns the number of frames required for a delay of a given time
      */
     my.getDurationInFrames = function(milliseconds){
-        return milliseconds * my.game.loopInterval;
+        return milliseconds / my.game.loopInterval;
     }
 
 
@@ -73,9 +73,14 @@ var whackacake = function all() {
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.ctx = my.canvas.getContext('2d');
+            my.canvas.addEventListener('click', $this.mouseDown);
+            my.canvas.addEventListener("touchstart", $this.touchDown, false);
+            my.canvas.addEventListener("touchmove", $this.touchMove, true);
+            my.canvas.addEventListener("touchend", $this.touchUp, false);
+            my.canvas.addEventListener("touchcancel", $this.touchUp, false);
+
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-            my.canvas.addEventListener('click', $this.canvasClicked, false);
-            my.canvas.addEventListener('onclick', 'alert ("hi");', false);
+
         }
 
 
@@ -97,16 +102,42 @@ var whackacake = function all() {
        		}
 			$this.cups.forEach(function(c) { c.updateState(); });
        }
+        		
+        this.mouseDown = function(e) {
+            var mouseX = e.pageX;
+            var mouseY = e.pageY;
+            mouseX -= my.canvas.offsetLeft;
+            mouseY -= my.canvas.offsetTop;
 
-        this.canvasClicked = function(e) {
-            var i;
-
-            for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(e.offsetX, e.offsetY) && $this.cups[i].hasIngredient()) {
-                    $this.clickedIngredient($this.cups[i]);
-                }
-            }
+        	$this.canvasPressed(mouseX, mouseY);
         }
+        
+        this.touchDown = function(e) {
+          if (!e) var e = event;
+          e.preventDefault();
+          touchX = e.targetTouches[0].pageX - my.canvas.offsetLeft;
+          touchY = e.targetTouches[0].pageY - my.canvas.offsetTop;
+          
+          $this.canvasPressed(touchX,touchY);
+
+        }
+        
+       /** 
+       This function determines which sprite was clicked
+       and takes relevant action. The x,y parameters are passed by
+       touchDown or mouseDown functions.
+       **/
+       
+        this.canvasPressed = function(x,y) {        
+        	var i;
+        	for (i = 0; i < $this.cups.length; i++) {
+        	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
+        	        $this.clickedIngredient($this.cups[i]);
+        	    }
+        	}
+        }
+        
+ 
 
         this.clickedIngredient = function(cup) {
             var type = cup.hasIngredient().getType();
@@ -163,7 +194,6 @@ var whackacake = function all() {
 
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
-            //this.ctx.fillStyle = "rgb(200,0,0)";
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
@@ -253,6 +283,7 @@ var whackacake = function all() {
                 this.coord.y = drawCoord.y;
                 if(this.animation.hasFinished()){
                     this.animation = null;
+                    console.log("finished");
                 }
             }
             ctx.drawImage(this.spriteImage,
@@ -280,6 +311,8 @@ var whackacake = function all() {
         this.endCoord = endCoord;
         this.diff = endCoord.difference(startCoord);
         this.duration = duration;
+        console.log("start time is: " + my.frameCount);
+        console.log("duration is: " + this.duration);
         this.startTime = my.frameCount
 
         this.getLocation = function(){
@@ -292,6 +325,13 @@ var whackacake = function all() {
         this.hasFinished = function(){
             return ($this.startTime + $this.duration) < my.frameCount;
         }
+    }
+
+
+    /**
+     * Takes a list of animations and repeats them in order.
+     */
+    var RepeatingAnimation = function(animations){
     }
     
     
@@ -310,8 +350,8 @@ var whackacake = function all() {
     	this.setIngredient = function(ingredient){
     		ingredient.sprite.coord = this.sprite.coord.clone();
             ingredient.sprite.animation = new TransAnimation($this.sprite.coord, 
-                                                             $this.sprite.coord.add(new Coords(10, 0)),
-                                                             1500);
+                                                             $this.sprite.coord.add(new Coords(0, -10)),
+                                                             my.getDurationInFrames(500));
     		ingredient.sprite.coord = $this.sprite.coord.clone();
     		$this.ingredient = ingredient;
     	}
