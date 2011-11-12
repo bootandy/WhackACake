@@ -50,7 +50,7 @@ var whackacake = function all() {
      * Returns the number of frames required for a delay of a given time
      */
     my.getDurationInFrames = function(milliseconds){
-        return milliseconds * my.game.loopInterval;
+        return milliseconds / my.game.loopInterval;
     }
 
 
@@ -163,7 +163,6 @@ var whackacake = function all() {
 
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
-            //this.ctx.fillStyle = "rgb(200,0,0)";
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
@@ -253,6 +252,7 @@ var whackacake = function all() {
                 this.coord.y = drawCoord.y;
                 if(this.animation.hasFinished()){
                     this.animation = null;
+                    console.log("finished");
                 }
             }
             ctx.drawImage(this.spriteImage,
@@ -280,6 +280,8 @@ var whackacake = function all() {
         this.endCoord = endCoord;
         this.diff = endCoord.difference(startCoord);
         this.duration = duration;
+        console.log("start time is: " + my.frameCount);
+        console.log("duration is: " + this.duration);
         this.startTime = my.frameCount
 
         this.getLocation = function(){
@@ -292,6 +294,13 @@ var whackacake = function all() {
         this.hasFinished = function(){
             return ($this.startTime + $this.duration) < my.frameCount;
         }
+    }
+
+
+    /**
+     * Takes a list of animations and repeats them in order.
+     */
+    var RepeatingAnimation = function(animations){
     }
     
     
@@ -310,8 +319,8 @@ var whackacake = function all() {
     	this.setIngredient = function(ingredient){
     		ingredient.sprite.coord = this.sprite.coord.clone();
             ingredient.sprite.animation = new TransAnimation($this.sprite.coord, 
-                                                             $this.sprite.coord.add(new Coords(10, 0)),
-                                                             1500);
+                                                             $this.sprite.coord.add(new Coords(0, -10)),
+                                                             my.getDurationInFrames(500));
     		ingredient.sprite.coord = $this.sprite.coord.clone();
     		$this.ingredient = ingredient;
     	}
