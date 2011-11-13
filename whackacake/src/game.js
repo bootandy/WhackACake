@@ -49,6 +49,12 @@ var whackacake = function all() {
     my = {};
     my.config = {
         spawnProbability:3/100,
+        gameTime:41,
+        ingredientStaysTimeRandom:50,
+        ingredientstaysTimeConstant:250,
+        goodItem:50,
+        badItem:-50,
+        
         gameOverCallback:function(score){}
     };
 
@@ -206,7 +212,7 @@ var whackacake = function all() {
         }
 
         this.getTime = function() {
-            return 41 - (new Date().getTime() - $this.startTime) /1000;
+            return my.config.gameTime - (new Date().getTime() - $this.startTime) /1000;
         }
 
 

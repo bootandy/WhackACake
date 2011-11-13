@@ -359,7 +359,8 @@ objects = function(gameobj){
         // expiryTime is in range: random(2000) + 2250 ->  250
         this.createTime = new Date().getTime();
         this.expiryTime = new Date().getTime()
-                + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
+                + parseInt(Math.random() * (gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom))
+                + gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom + gameobj.config.ingredientstaysTimeConstant;
         
     	this.wasHit = false;
     	
@@ -386,15 +387,20 @@ objects = function(gameobj){
             this.wasHit = true;
             gameobj.game.cakeStack.addToCakeStack(type_no);
             if (type_no < 5) {
-                return 100 + $this.hitFastBonus();
+                return gameobj.config.goodItem + $this.hitFastBonus();
             } else {
-                return - 50;
+                return gameobj.config.badItem;
             }
         }
         
         this.hitFastBonus = function() {
             // up to a 100 point bonus for being quick
-            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 40 );
+            return parseInt(
+                        Math.max(
+                            this.createTime
+                            - new Date().getTime()
+                            + (gameobj.config.ingredientStaysTimeRandom * 2 *  gameobj.config.gameTime), 0)
+                    / gameobj.config.gameTime );
         }
 
     }
