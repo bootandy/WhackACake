@@ -64,7 +64,23 @@ var whackacake = function all() {
         return milliseconds / my.game.loopInterval;
     }
 
-
+    my.getMousePosition = function(e) {
+      e = e || window.event;
+      var cursor = {x:0, y:0};
+      if (e.pageX || e.pageY) {
+          cursor.x = e.pageX;
+          cursor.y = e.pageY;
+      } 
+      else {
+          var de = document.documentElement;
+          var b = document.body;
+          cursor.x = e.clientX + 
+              (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+          cursor.y = e.clientY + 
+              (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+      }
+      return cursor;
+    }
 
     ///---------------- objects ----------------
 
@@ -94,7 +110,7 @@ var whackacake = function all() {
             $this.cursor = new my.Cursor(60, 62, $this.images.cursor_down);
             $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
-            my.canvas.addEventListener('click', $this.mouseDown);
+            my.canvas.addEventListener('click', $this.mouseDown,false);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
@@ -133,8 +149,9 @@ var whackacake = function all() {
        }
         		
         this.mouseDown = function(e) {
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
+            var mousePosition = my.getMousePosition(e);
+            var mouseX = mousePosition.x;
+            var mouseY = mousePosition.y;
             mouseX -= my.canvas.offsetLeft;
             mouseY -= my.canvas.offsetTop;
             $this.cursor.down()

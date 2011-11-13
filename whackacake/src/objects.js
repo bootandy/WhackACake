@@ -426,8 +426,9 @@ objects = function(gameobj){
             }
       };
       $this.setPosition = function(e){
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
+            var mousePosition = gameobj.getMousePosition(e);
+            var mouseX = mousePosition.x;
+            var mouseY = mousePosition.y;
             $this.x = mouseX -gameobj.canvas.offsetLeft;
             $this.y = mouseY -gameobj.canvas.offsetTop;
       }
