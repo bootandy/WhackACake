@@ -16,10 +16,41 @@ if (!Object.prototype.forEach)
     };
 }
 
+/*
+ * * Recursively merge properties of two objects 
+ * */
+function merge(obj1, obj2) {
+
+    for (var p in obj2) {
+        try {
+            //Property in destination object set; update its value.
+            if ( obj2[p].constructor==Object ) {
+                obj1[p] = MergeRecursive(obj1[p], obj2[p]);
+
+            } else {
+                obj1[p] = obj2[p];
+
+            }
+
+        } catch(e) {
+            // Property in destination object not set; create it and set its value.
+            obj1[p] = obj2[p];
+
+        }
+    }
+
+    return obj1;
+}
 
 
-var whackacake = function all() {
+
+
+var whackacake = function all(config) {
     my = {};
+    my.config = {
+        spawnProbability:3/100,
+    };
+    my.config = merge(my.config, config);
 
 
     my.init = function() {
@@ -41,11 +72,23 @@ var whackacake = function all() {
 
         console.debug("canvas: " + style);
 
+        //my.start();
+        //my.game = new Game();
+        //my.game.init();
+        //my.loop = setInterval("my.game.loop()", my.game.loopInterval);
+
+    }
+
+    my.start = function(){
         my.game = new Game();
         my.game.init();
         my.loop = setInterval("my.game.loop()", my.game.loopInterval);
-
     }
+
+    my.setSpawnProb = function(value){
+        config.spawnProbability = value;
+    }
+
 
     /**
      * Returns the number of frames required for a delay of a given time
@@ -67,7 +110,6 @@ var whackacake = function all() {
             $this.loopInterval = 30;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability = 3/100;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -106,20 +148,20 @@ var whackacake = function all() {
 
         this.updateState = function(){
 
-            if (Math.random() < $this.spawnProbability) {
+            if (Math.random() < my.config.spawnProbability) {
                 var cup = $this.getRandomCup()
-                if (!cup.hasIngredient()) {
-       	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
-       	   	    }
-       		}
+                    if (!cup.hasIngredient()) {
+                        cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
+                    }
+            }
             $this.cups.forEach(function(c) { c.updateState(); });
 
             // Look at the first animatedText element - if it has finished we remove it.
             if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
                 $this.animatedText.shift();
             }
-       }
-        		
+        }
+
         this.mouseDown = function(e) {
             var mouseX = e.pageX;
             var mouseY = e.pageY;
@@ -153,12 +195,12 @@ var whackacake = function all() {
          **/
 
         this.canvasPressed = function(x,y) {        
-        	var i;
-        	for (i = 0; i < $this.cups.length; i++) {
-        	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
-        	        $this.clickedIngredient($this.cups[i], x, y);
-        	    }
-        	}
+            var i;
+            for (i = 0; i < $this.cups.length; i++) {
+                if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
+                    $this.clickedIngredient($this.cups[i], x, y);
+                }
+            }
         }
 
 
@@ -177,11 +219,11 @@ var whackacake = function all() {
             }
             //animate score message popping up
             var textAnimation = new my.TransAnimation(new my.Coords(messageX, messageY),
-                                                            new my.Coords(messageX, messageY - 50),
-                                                            my.getDurationInFrames(1000));
+                    new my.Coords(messageX, messageY - 50),
+                    my.getDurationInFrames(1000));
 
             $this.animatedText.push( new my.AnimatedText( messageX, messageY, textAnimation, scoreToAdd ));
-            
+
             $this.score += scoreToAdd;
         }
 
@@ -223,13 +265,13 @@ var whackacake = function all() {
                       [screenWidth / 4, 3 * screenHeight / 4],
                       [3 * screenWidth / 4, 3 * screenHeight / 4]]
 
-            var result = new Array;
+                          var result = new Array;
             for(var i = 0; i < positions.length; i++){
                 frontSprite = new my.Sprite(positions[i][0], positions[i][1], $this.images.cupFront);
                 backSprite = new my.Sprite(positions[i][0], positions[i][1], $this.images.cup);
                 result.push(new my.Cup(frontSprite, backSprite));
             }
-           return result;
+            return result;
         }
 
         this.getRandomCup = function() {

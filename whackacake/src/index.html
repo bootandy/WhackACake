@@ -3,6 +3,11 @@
     <title>Whack a Cake - Children in Need</title>
     <script type="text/javascript" src="objects.js" charset="utf-8"></script>
     <script type="text/javascript" src="game.js" ></script>
+    <script type="text/javascript">
+        function buttonClicked(e){
+            whackacake.start();
+        }
+    </script>
 
     <style>
         #score_div{
@@ -73,6 +78,8 @@ Time: <span id='timer' >N/A</span>
 <div id="frame_div">
 Frames: <span id='frames' >0</span>
 </div>
+
+<button type="button" click="buttonClicked">Start</button>
 
 </body>
 </html>
