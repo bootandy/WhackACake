@@ -72,7 +72,6 @@ var whackacake = function all() {
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
-            $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
@@ -171,25 +170,15 @@ var whackacake = function all() {
             $this.images.ingredients = addImage("images/ingredients.png", 50, 50);
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
-            $this.images.cakeLayers = new Image();
-            $this.images.cakeLayers.src = "images/cake_layers.png";
-
+            for (i=0; i<10; i++) {
+                $this.images["ingredient_"+i] = addImage("images/ing_"+i+".png", 50, 50);
+                $this.images["cake_layer_"+i] = addImage("images/cl_"+i+".png", 100, 50);
+            }
         }
 
 
         this.incrementCakes = function() {
             $this.cakesFinished++;
-        }
-
-        this.createIngredients = function() {
-            var screenWidth = my.canvas.width;
-            var screenHeight = my.canvas.height;
-
-            var result = [];
-        	var ingredient = new my.Ingredient(new my.SpriteFromWidthHeightAndImage($this.images.choc));
-            result.push(ingredient);
-        	return result;
-
         }
 
 
@@ -200,11 +189,11 @@ var whackacake = function all() {
             console.log('here');
 
             var result = new Array;
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage (screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(screenWidth / 2, screenHeight / 2, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(3 * screenWidth / 4, screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 2, screenHeight / 2, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
             console.log(result);
             return result;
         }

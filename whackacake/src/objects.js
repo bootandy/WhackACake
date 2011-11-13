@@ -12,19 +12,17 @@ objects = function(gameobj){
                 $this.cakeSlices = [];
             }
 
-            var x = 50;
-            var cakeLayerHeight = 50;
-            var cakeLayerHeightOverlay = 31; //we cover up the previous cake layer slightly
-            var cakeLayerSourceHeight = 154;
-            var cakeLayerSourceWidth = 300;
+            var cakeLayerHeightOverlay = 31;
 
+            var cakeLayerHeight = 50;
+            var cakeLayerWidth = 100; // TODO
+            var x = 50;
             var y = gameobj.canvas_cake_stack.height - 100;
             y = y - cakeLayerHeightOverlay * $this.cakeSlices.length;
 
             var s = new gameobj.Sprite(
-                    x, y, 100, cakeLayerHeight,
-                    cakeImage,
-                    0, cakeLayerSourceHeight * type, cakeLayerSourceWidth, cakeLayerSourceHeight
+                    x, y,
+                    gameobj.game.images["cake_layer_"+type]
             );
 
             $this.cakeSlices.push(new gameobj.CakeSlice(s));
@@ -62,37 +60,16 @@ objects = function(gameobj){
         }
     }
 
-    // Named Sprite constructors
-    gameobj.SpriteFromImage = function(spriteImage) {
-        return new gameobj.Sprite(null, null, spriteImage.width, spriteImage.height, spriteImage, 0, 0, null, null)
-    }
-    
-    gameobj.SpriteFromWidthHeightAndImage = function(width, height, spriteImage) {
-        return new gameobj.Sprite(null, null, width, height, spriteImage);
-    }
-    
-    gameobj.SpriteAtXYFromImage = function(x, y, spriteImage) {
-        return new gameobj.Sprite(x, y, spriteImage.width, spriteImage.height, spriteImage, null, null, null, null);
-    }
-    
-    gameobj.SpriteAtXYWithWidthHeightFromImage = function(x, y, width, height, spriteImage) {
-        return new gameobj.Sprite(x, y, width, height, spriteImage, null, null, null, null);
-    }
 
-    gameobj.Sprite = function(x, y, width, height, spriteImage, img_x, img_y, img_width, img_height) {
+    gameobj.Sprite = function(x, y, spriteImage) {
         var $this = this;
         this.coord = new gameobj.Coords(x, y);
-        this.img_coords = new gameobj.Coords(img_x, img_y);
-        this.width = width;
-        this.height = height;
-        this.img_width = img_width;
-        this.img_height = img_height;
+        this.width = spriteImage.width;
+        this.height = spriteImage.height;
         this.spriteImage = spriteImage;
         this.animation = null;
 
         this.draw = function(ctx) {
-            var xPos = 0;
-            var yPos = 0;
             if(this.animation){
                 drawCoord = this.animation.getLocation();
                 this.coord.x = drawCoord.x;
@@ -103,19 +80,12 @@ objects = function(gameobj){
                 }
             }
 
-            if (this.img_coords.x != null && this.img_coords.y != null) {
-                ctx.drawImage(this.spriteImage,
-                        Math.floor(this.coord.x - this.width/2),
-                        Math.floor(this.coord.y - this.height/2),
-                        this.width,
-                        this.height);
-            } else {
-                ctx.drawImage(this.spriteImage,
-                        Math.floor(this.coord.x - this.width/2),
-                        Math.floor(this.coord.y - this.height/2),
-                        this.width,
-                        this.height);
-            }
+
+            ctx.drawImage(this.spriteImage,
+                    Math.floor(this.coord.x - this.width/2),
+                    Math.floor(this.coord.y - this.height/2),
+                    this.width,
+                    this.height);
         }
 
         this.isClickedOn = function(x, y) {
@@ -290,8 +260,9 @@ objects = function(gameobj){
 
     gameobj.Ingredient = function(type_no){
     	var $this = this;
-    	this.type_no = type_no
-    	this.sprite = new gameobj.Sprite(null, null, 50, 50, gameobj.game.images.ingredients, 0, type_no*160, 212, 160);
+    	this.type_no = type_no;
+    	console.log(type_no);
+    	this.sprite = new gameobj.Sprite(null, null, gameobj.game.images["ingredient_"+type_no]);
     	this.visible = false;
     	this.expiryTime = gameobj.frameCount + (2*1000.0)/gameobj.game.loopInterval;
     	this.wasHit = false;
