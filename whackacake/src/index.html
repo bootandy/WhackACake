@@ -3,6 +3,19 @@
     <title>Whack a Cake - Children in Need</title>
     <script type="text/javascript" src="objects.js" charset="utf-8"></script>
     <script type="text/javascript" src="game.js" ></script>
+    <script type="text/javascript">
+        function buttonClicked(e){
+            document.getElementById("startButton").disabled=true;
+            spawnProbt = document.getElementById("spawnProbText").value
+            if(spawnProbt != ""){
+                whackacake.setSpawnProb(eval(spawnProbt));
+            }
+            whackacake.start();
+        };
+        function gameOver(score){
+            document.getElementById("startButton").disabled = false;
+        }
+    </script>
 
     <style>
         #score_div{
@@ -51,7 +64,7 @@
     </style>
 </head>
 
-<body onload="whackacake.init()">
+<body onload="whackacake.init({gameOverCallback:gameOver})">
 <div id='score_div' >
     Score:<span id='game_score' >0</span>
 </div>
@@ -73,6 +86,12 @@ Time: <span id='timer' >N/A</span>
 <div id="frame_div">
 Frames: <span id='frames' >0</span>
 </div>
+
+<button id="startButton" type="button" onclick="buttonClicked()">Start</button>
+<form action="" method="get" accept-charset="utf-8">
+    <label for="spawnProbText">Spawn probability: </label>
+    <input name="spawProbText" id="spawnProbText" />
+</form>
 
 </body>
 </html>
