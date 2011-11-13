@@ -332,5 +332,20 @@ objects = function(gameobj){
             return type_no;
         }
     }
-
+    gameobj.Background = function(width,height,backgroundImage){
+    	var $this = this;
+      $this.width = width;
+      $this.height = height;
+      $this.backgroundImage = backgroundImage;
+      $this.draw = function(ctx) {
+            var xPos = 0;
+            var yPos = 0;
+            ctx.drawImage(this.backgroundImage,
+            0,
+            0,
+            this.width,
+            this.height);
+      }
+    }
 }
+
