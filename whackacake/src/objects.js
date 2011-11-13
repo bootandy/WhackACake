@@ -34,7 +34,7 @@ objects = function(gameobj){
 
             $this.cakeSlices[gameobj.game.cakesFinished].push(new gameobj.CakeSlice(s));
         };
-
+        
         this.draw = function(ctx_cake_stack) {
 
             var i;
@@ -46,6 +46,22 @@ objects = function(gameobj){
         };
 
         this.slideAway = function(cake_list) {
+
+            var x = 0; //cake_list[cake_list.length-1].sprite.coord.x - 100;
+            var y = cake_list[cake_list.length-1].sprite.coord.y;
+
+            //animate score message popping up
+            var textAnimation = new my.TransAnimation(
+                    new my.Coords(x, y ),
+                    new my.Coords(x, y - 200),
+                    my.getDurationInFrames(4000));
+
+            gameobj.game.animatedText.push( new my.AnimatedText(
+                    x,
+                    y,
+                    textAnimation,
+                     (gameobj.game.cakesFinished + 1) +" X" ));
+
             for(j =0; j < cake_list.length; j++) {
                 cake_list[j].slideAway();
             }
@@ -93,8 +109,10 @@ objects = function(gameobj){
             if (this.animation.hasFinished()){
                 return true;
             }
-
-            ctx.fillText($this.str, $this.coord.x, $this.coord.y );
+            
+            round_x = ~~ ($this.coord.x+0.5)
+            round_y = ~~ ($this.coord.y+0.5)
+            ctx.fillText($this.str, round_x, round_y);
             return false;
         }
 
@@ -127,8 +145,16 @@ objects = function(gameobj){
                     this.animation = null;
                 }
             }
-
-
+            
+            /**
+            bitwise operations is faster than math.floor
+            bitwise operation takes away digits after decimal point 
+            ~~ = switch bits and then switch again
+            adding 0.5 first so it rounds up to the closest number
+            **/ 
+            round_x= ~~ (this.coord.x+0.5);
+            round_y= ~~ (this.coord.y+0.5) 
+            
             ctx.drawImage(this.spriteImage,
                     Math.floor(this.coord.x - this.width/2),
                     Math.floor(this.coord.y - this.height/2),
@@ -137,8 +163,8 @@ objects = function(gameobj){
         }
 
         this.isClickedOn = function(x, y) {
-            if (( $this.coord.x - $this.width < x && $this.coord.x + $this.width > x )
-                    && ( $this.coord.y - $this.height < y && $this.coord.y + $this.height > y )) {
+            if (( $this.coord.x - $this.width /2 < x && $this.coord.x + $this.width / 2 > x )
+                    && ( $this.coord.y - $this.height /2 < y && $this.coord.y + $this.height / 2 > y )) {
                 return true;
             }
             return false;
@@ -325,7 +351,6 @@ objects = function(gameobj){
     gameobj.Ingredient = function(type_no){
     	var $this = this;
     	this.type_no = type_no;
-    	console.log(type_no);
     	this.sprite = new gameobj.Sprite(null, null, gameobj.game.images["ingredient_"+type_no]);
     	this.visible = false;
 
@@ -333,7 +358,8 @@ objects = function(gameobj){
         // expiryTime is in range: random(2000) + 2250 ->  250
         this.createTime = new Date().getTime();
         this.expiryTime = new Date().getTime()
-                + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
+                + parseInt(Math.random() * (gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom))
+                + gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom + gameobj.config.ingredientstaysTimeConstant;
         
     	this.wasHit = false;
     	
@@ -360,15 +386,22 @@ objects = function(gameobj){
             this.wasHit = true;
             gameobj.game.cakeStack.addToCakeStack(type_no);
             if (type_no < 5) {
-                return 100 + $this.hitFastBonus();
+                gameobj.game.sounds.good_hit.play();
+                return gameobj.config.goodScore + $this.hitFastBonus();
             } else {
-                return - 50;
+                gameobj.game.sounds.bad_hit.play();
+                return gameobj.config.badScore; // + $this.hitFastBonus();
             }
         }
         
         this.hitFastBonus = function() {
             // up to a 100 point bonus for being quick
-            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 40 );
+            return parseInt(
+                        Math.max(
+                            this.createTime
+                            - new Date().getTime()
+                            + (gameobj.config.ingredientStaysTimeRandom * 2 *  gameobj.config.gameTime), 0)
+                    / gameobj.config.gameTime );
         }
 
     }

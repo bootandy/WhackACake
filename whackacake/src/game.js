@@ -16,10 +16,54 @@ if (!Object.prototype.forEach)
     };
 }
 
+/*
+ * * Recursively merge properties of two objects 
+ * */
+function merge(obj1, obj2) {
+
+    for (var p in obj2) {
+        try {
+            //Property in destination object set; update its value.
+            if ( obj2[p].constructor==Object ) {
+                obj1[p] = MergeRecursive(obj1[p], obj2[p]);
+
+            } else {
+                obj1[p] = obj2[p];
+
+            }
+
+        } catch(e) {
+            // Property in destination object not set; create it and set its value.
+            obj1[p] = obj2[p];
+
+        }
+    }
+
+    return obj1;
+}
+
+
+
+
 var whackacake = function all() {
     my = {};
+    my.config = {
+        spawnProbability:3/100,
+        gameTime:41,
+        ingredientStaysTimeRandom:50,
+        ingredientstaysTimeConstant:250,
+        goodScore:100,
+        badScore:-100,
+        
+        gameOverCallback:function(score){}
+    };
 
-    my.init = function() {
+    /*my.init = function() {
+        
+        }*/
+
+
+    my.init = function(config) {
         var findPosition =function(obj){
             var curleft = curtop = 0;
             if (obj.offsetParent) {
@@ -30,7 +74,7 @@ var whackacake = function all() {
             return [curleft,curtop];
           }
         }
-
+        my.config = merge(my.config, config);
         my.canvas = document.getElementById("main_canvas");
         my.canvas_cake_stack = document.getElementById("cake_stack");
         var screenWidth = 640;
@@ -48,20 +92,52 @@ var whackacake = function all() {
         my.canvas_cake_stack.height = screenHeight;
         my.canvas_cake_stack.width = cakeStackWidth;
 
-
-        //console.debug("canvas: " + style);
-
-        my.game = new Game();
-        my.game.init();
-        my.loop = setInterval("my.game.loop()", my.game.loopInterval);
+				/**
+				* User agent matching to detect iOS devices and Android devices
+				* Currently used to adjust animation duration
+				**/
+				
+				my.isRunningOnIos = false;
+				my.isRunningOnAndroid = false;
+				if (navigator.userAgent.match(/like Mac OS X/i)) {
+				   my.isRunningOnIos = true;
+				}
+				
+							if (navigator.userAgent.match(/Android/i)) {
+							   my.isRunningOnAndroid = true;
+							}
 
     }
 
+    my.start = function(){
+        my.game = new Game();
+        my.game.init();
+        my.loop = setInterval("my.game.loop()", my.game.loopInterval);
+    }
+
+    my.setSpawnProb = function(value){
+        my.config.spawnProbability = value;
+    }
+    my.setGoodScore = function(value){
+        my.config.goodScore = value;
+    }
+    my.setBadScore = function(value){
+        my.config.badScore = value;
+    }
+
+
     /**
      * Returns the number of frames required for a delay of a given time
+		 * Adjusts according to device type
      */
+
     my.getDurationInFrames = function(milliseconds){
-        return milliseconds / my.game.loopInterval;
+		if (my.isRunningOnIos)
+        return milliseconds / my.game.loopInterval/2;
+		else if (my.isRunningOnAndroid)
+			return milliseconds/my.game.loopInterval/5;
+		else
+			return milliseconds/my.game.loopInterval;
     }
 
     my.getMousePosition = function(e) {
@@ -93,9 +169,8 @@ var whackacake = function all() {
             $this.loopInterval = 30;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability = 3/100;
             my.frameCount = 0;
-            $this.images = {};
+            $this.loadSounds();
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
@@ -103,8 +178,12 @@ var whackacake = function all() {
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
+            
+            //horrible hack to allow multiple games without refresh
             $this.timerDisplay = document.getElementById("timer");
             my.gameDiv = document.getElementById("game");
+            $this.timerDisplay.setAttribute("style", ""); 
+
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
             $this.cursor = new my.Cursor(60, 62, $this.images.cursor_down);
@@ -134,20 +213,20 @@ var whackacake = function all() {
 
         this.updateState = function(){
 
-            if (Math.random() < $this.spawnProbability) {
+            if (Math.random() < my.config.spawnProbability) {
                 var cup = $this.getRandomCup()
-                if (!cup.hasIngredient()) {
-       	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
-       	   	    }
-       		}
+                    if (!cup.hasIngredient()) {
+                        cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
+                    }
+            }
             $this.cups.forEach(function(c) { c.updateState(); });
             $this.cursor.updateState();
             // Look at the first animatedText element - if it has finished we remove it.
             if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
                 $this.animatedText.shift();
             }
-       }
-        		
+        }
+
         this.mouseDown = function(e) {
             var mousePosition = my.getMousePosition(e);
             var mouseX = mousePosition.x;
@@ -171,7 +250,7 @@ var whackacake = function all() {
         }
 
         this.getTime = function() {
-            return 41 - (new Date().getTime() - $this.startTime) /1000;
+            return my.config.gameTime - (new Date().getTime() - $this.startTime) /1000;
         }
 
 
@@ -182,12 +261,12 @@ var whackacake = function all() {
          **/
 
         this.canvasPressed = function(x,y) {        
-        	var i;
-        	for (i = 0; i < $this.cups.length; i++) {
-        	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
-        	        $this.clickedIngredient($this.cups[i], x, y);
-        	    }
-        	}
+            var i;
+            for (i = 0; i < $this.cups.length; i++) {
+                if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
+                    $this.clickedIngredient($this.cups[i], x, y);
+                }
+            }
         }
 
 
@@ -206,11 +285,11 @@ var whackacake = function all() {
             }
             //animate score message popping up
             var textAnimation = new my.TransAnimation(new my.Coords(messageX, messageY),
-                                                            new my.Coords(messageX, messageY - 50),
-                                                            my.getDurationInFrames(1000));
+                    new my.Coords(messageX, messageY - 50),
+                    my.getDurationInFrames(1000));
 
             $this.animatedText.push( new my.AnimatedText( messageX, messageY, textAnimation, scoreToAdd ));
-            
+
             $this.score += scoreToAdd;
         }
 
@@ -222,6 +301,7 @@ var whackacake = function all() {
                 im.height = height;
                 return im;
             }
+            $this.images={}
             $this.images.cup = addImage("images/bowl_back.png", 150, 100);
             $this.images.cupFront = addImage("images/bowl_front.png", 150, 100);
             $this.images.ingredients = addImage("images/ingredients.png", 150, 150);
@@ -233,7 +313,27 @@ var whackacake = function all() {
             }
             $this.images.cursor_down =  addImage("images/bat_down.png");
         }
-
+        
+        
+        this.loadSounds = function() {
+            var addSound = function(src) {
+                var aud = document.createElement("audio");
+                // Set source files for audio
+                [".mp3", ".wav", ".ogg"].forEach(function(ext) {
+                    var src_el = document.createElement("source");
+                    src_el.setAttribute("src", src+ext);
+                    aud.appendChild(src_el);
+                });
+                aud.addEventListener('ended', function() {
+                    this.currentTime=0;
+                    this.pause();
+                });
+                return aud;
+            }
+            $this.sounds = {}
+            $this.sounds.good_hit = addSound("sound/good_hit");
+            $this.sounds.bad_hit = addSound("sound/bad_hit");
+        }
 
         this.incrementCakes = function() {
             $this.cakesFinished++;
@@ -250,13 +350,13 @@ var whackacake = function all() {
                       [screenWidth / 4, 3 * screenHeight / 4],
                       [3 * screenWidth / 4, 3 * screenHeight / 4]]
 
-            var result = new Array;
+                          var result = new Array;
             for(var i = 0; i < positions.length; i++){
                 frontSprite = new my.Sprite(positions[i][0], positions[i][1], $this.images.cupFront);
                 backSprite = new my.Sprite(positions[i][0], positions[i][1], $this.images.cup);
                 result.push(new my.Cup(frontSprite, backSprite));
             }
-           return result;
+            return result;
         }
 
         this.getRandomCup = function() {
@@ -294,7 +394,7 @@ var whackacake = function all() {
             }
             $this.cursor.draw($this.ctx);
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
-            $this.ctx.font = "40pt Calibri";
+            $this.ctx.font = "40pt ARia";
             for (i = 0; i < $this.animatedText.length; i++) {
                 $this.animatedText[i].draw($this.ctx);
             }
@@ -309,7 +409,7 @@ var whackacake = function all() {
             if ($this.cakesFinished > 0) {
                 $this.score = $this.score * $this.cakesFinished
             }
-            alert("Game Over: Score: "+oldScore + " X Cakes Made: "+$this.cakesFinished+" = Final Score: "+ $this.score);
+            my.config.gameOverCallback($this.score);
         }
     }
 

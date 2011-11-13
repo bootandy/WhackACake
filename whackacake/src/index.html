@@ -3,6 +3,29 @@
     <title>Whack a Cake - Children in Need</title>
     <script type="text/javascript" src="objects.js" charset="utf-8"></script>
     <script type="text/javascript" src="game.js" ></script>
+    <script type="text/javascript">
+        function buttonClicked(e){
+            document.getElementById("startButton").disabled=true;
+            spawnProbt = document.getElementById("spawnProbText").value
+            if(spawnProbt != ""){
+                whackacake.setSpawnProb(eval(spawnProbt));
+            }
+            whackacake.start();
+
+            goodScore = document.getElementById("goodScoreText").value;
+            if(goodScore != ""){
+                whackacake.setGoodScore(eval(goodScore));
+            }
+
+            badScore = document.getElementById("badScoreText").value;
+            if(badScore != ""){
+                whackacake.setBadScore(eval(badScore));
+            }
+        };
+        function gameOver(score){
+            document.getElementById("startButton").disabled = false;
+        }
+    </script>
 
     <style>
         #score_div{
@@ -57,7 +80,7 @@
     </style>
 </head>
 
-<body onload="whackacake.init()">
+<body onload="whackacake.init({gameOverCallback:gameOver})">
 <div id='game' class='cursor_up'>
   
   <div id='score_div' >
@@ -69,7 +92,6 @@
   <div id="time_div">
   Time: <span id='timer' >N/A</span>
   </div>
-
   <canvas id="cake_stack" >
   </canvas>
 
@@ -83,5 +105,24 @@
   Frames: <span id='frames' >0</span>
   </div>
 </div>
+<button id="startButton" type="button" onclick="buttonClicked()">Start</button>
+<form action="" method="get" accept-charset="utf-8">
+    <ul style="list-style-type:none;">
+        <li>
+            <label for="spawnProbText">Spawn probability: </label>
+            <input name="spawProbText" id="spawnProbText" />
+        </li>
+        <li>
+            <label for="goodScoreText">Good Score</label>
+            <input name="goodScoreText" id="goodScoreText" />
+        </li>
+        <li>
+            <label for="badScoreText">Bad Score</label>
+            <input name="badScoreText" id="badScoreText" />
+        </li>
+</ul>
+</form>
+
+>>>>>>> ef367cad934688d437033d65c65dd27298ca62ed
 </body>
 </html>
