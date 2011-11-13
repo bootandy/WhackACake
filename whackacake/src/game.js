@@ -219,7 +219,7 @@ var whackacake = function all() {
 
             positions = [[screenWidth / 4 + 20, screenHeight / 4 + 50],
                       [3 * screenWidth / 4 - 20, screenHeight / 4 + 50],
-                      [screenWidth / 2, screenHeight / 2],
+                      [screenWidth / 2, screenHeight / 2 + 20],
                       [screenWidth / 4, 3 * screenHeight / 4],
                       [3 * screenWidth / 4, 3 * screenHeight / 4]]
 
