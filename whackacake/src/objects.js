@@ -2,14 +2,19 @@ objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
         this.cakeImage = cakeImage;
+        // we have a 2D array of cake slicers: ie we save all our old cakes
         this.cakeSlices = [];
+        $this.cakeSlices[0] = [];
 
         this.addToCakeStack = function(type) {
 
-            // If we have finished a cake
-            if ($this.cakeSlices.length == 5) {
+            // If we have finished a cake - 5 cake slices
+            if ($this.cakeSlices[gameobj.game.cakesFinished].length == 5) {
+                // slide cakes away
+                $this.slideAway($this.cakeSlices[gameobj.game.cakesFinished]);
+
                 gameobj.game.incrementCakes();
-                $this.cakeSlices = [];
+                $this.cakeSlices[gameobj.game.cakesFinished] = [];
             }
 
             var cakeLayerHeightOverlay = 31;
@@ -18,22 +23,30 @@ objects = function(gameobj){
             var cakeLayerWidth = 100; // TODO
             var x = 50;
             var y = gameobj.canvas_cake_stack.height - 100;
-            y = y - cakeLayerHeightOverlay * $this.cakeSlices.length;
+            y = y - cakeLayerHeightOverlay * $this.cakeSlices[gameobj.game.cakesFinished].length;
 
             var s = new gameobj.Sprite(
                     x, y,
                     gameobj.game.images["cake_layer_"+type]
             );
 
-            $this.cakeSlices.push(new gameobj.CakeSlice(s));
+            $this.cakeSlices[gameobj.game.cakesFinished].push(new gameobj.CakeSlice(s));
         };
 
         this.draw = function(ctx_cake_stack) {
             var i;
             for(i =0; i < $this.cakeSlices.length; i++) {
-                $this.cakeSlices[i].draw(ctx_cake_stack);
+                for(j =0; j < $this.cakeSlices[i].length; j++) {
+                    $this.cakeSlices[i][j].draw(ctx_cake_stack);
+                }
             }
         };
+
+        this.slideAway = function(cake_list) {
+            for(j =0; j < cake_list.length; j++) {
+                cake_list[j].slideAway();
+            }
+        }
 
     };
 
@@ -70,6 +83,12 @@ objects = function(gameobj){
         this.animation = null;
 
         this.draw = function(ctx) {
+        
+            // If we have moved off the left of the screen dont draw anything
+            if ($this.coord.x + $this.width/2 < 0) {
+                return;
+            }
+
             if(this.animation){
                 drawCoord = this.animation.getLocation();
                 this.coord.x = drawCoord.x;
@@ -203,6 +222,13 @@ objects = function(gameobj){
         this.draw = function(ctx){
             this.sprite.draw(ctx);
         }
+
+        this.slideAway = function() {
+            this.sprite.animation = new gameobj.TransAnimation($this.sprite.coord,
+                                                                    new gameobj.Coords(-100, $this.sprite.coord.y),
+                                                                    gameobj.getDurationInFrames(1000));
+            this.sprite.animation.start();
+        }
     };
 
     
@@ -264,11 +290,16 @@ objects = function(gameobj){
     	console.log(type_no);
     	this.sprite = new gameobj.Sprite(null, null, gameobj.game.images["ingredient_"+type_no]);
     	this.visible = false;
-    	this.expiryTime = gameobj.frameCount + (2*1000.0)/gameobj.game.loopInterval;
+
+        // getTime returns 40 - 0
+        // expiryTime is in range: random(2000) + 2250 ->  250
+        this.expiryTime = new Date().getTime()
+                + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
+        
     	this.wasHit = false;
     	
     	this.isExpired = function(){
-    		if(this.wasHit || (this.expiryTime > 0 && gameobj.frameCount - this.expiryTime > 0)){
+    		if(this.wasHit || (this.expiryTime <  new Date().getTime())) {
     			return true;
     		}
     		return false;
@@ -285,9 +316,6 @@ objects = function(gameobj){
             $this.sprite.animation.start();
         }
     	
-        this.setMaxDisplayTime = function(value){
-            this.expiryTime = gameobj.frameCount + value;
-        }
 
         this.getScore = function() {
             // TODO
@@ -302,5 +330,20 @@ objects = function(gameobj){
             return type_no;
         }
     }
-
+    gameobj.Background = function(width,height,backgroundImage){
+    	var $this = this;
+      $this.width = width;
+      $this.height = height;
+      $this.backgroundImage = backgroundImage;
+      $this.draw = function(ctx) {
+            var xPos = 0;
+            var yPos = 0;
+            ctx.drawImage(this.backgroundImage,
+            0,
+            0,
+            this.width,
+            this.height);
+      }
+    }
 }
+

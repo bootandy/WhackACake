@@ -66,7 +66,7 @@ var whackacake = function all() {
             $this.loopInterval = 15;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability = $this.loopInterval / 1000;
+            $this.spawnProbability = 3/100;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -77,6 +77,7 @@ var whackacake = function all() {
             $this.cakesDisplay = document.getElementById("cakes");
             $this.timerDisplay = document.getElementById("timer");
             $this.ctx = my.canvas.getContext('2d');
+            $this.background = new my.Background(my.canvas.width,my.canvas.height,$this.images.background);
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
@@ -122,7 +123,9 @@ var whackacake = function all() {
         }
         
         this.touchDown = function(e) {
-          if (!e) var e = event;
+          if (!e) {
+              var e = event;
+          }
           e.preventDefault();
           touchX = e.targetTouches[0].pageX - my.canvas.offsetLeft;
           touchY = e.targetTouches[0].pageY - my.canvas.offsetTop;
@@ -174,6 +177,8 @@ var whackacake = function all() {
                 $this.images["ingredient_"+i] = addImage("images/ing_"+i+".png", 50, 50);
                 $this.images["cake_layer_"+i] = addImage("images/cl_"+i+".png", 100, 50);
             }
+            $this.images.background = new Image;
+            $this.images.background.src = "images/background.png";
         }
 
 
@@ -210,7 +215,7 @@ var whackacake = function all() {
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
-
+            $this.background.draw($this.ctx);
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
             this.cakesDisplay.innerHTML = $this.cakesFinished;
@@ -232,7 +237,7 @@ var whackacake = function all() {
             }
 
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
-
+            
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
 
