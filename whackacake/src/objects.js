@@ -2,14 +2,19 @@ objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
         this.cakeImage = cakeImage;
+        // we have a 2D array of cake slicers: ie we save all our old cakes
         this.cakeSlices = [];
+        $this.cakeSlices[0] = [];
 
         this.addToCakeStack = function(type) {
 
-            // If we have finished a cake
-            if ($this.cakeSlices.length == 5) {
+            // If we have finished a cake - 5 cake slices
+            if ($this.cakeSlices[gameobj.game.cakesFinished].length == 5) {
+                // slide cakes away
+                $this.slideAway($this.cakeSlices[gameobj.game.cakesFinished]);
+
                 gameobj.game.incrementCakes();
-                $this.cakeSlices = [];
+                $this.cakeSlices[gameobj.game.cakesFinished] = [];
             }
 
             var x = 50;
@@ -19,7 +24,7 @@ objects = function(gameobj){
             var cakeLayerSourceWidth = 300;
 
             var y = gameobj.canvas_cake_stack.height - 100;
-            y = y - cakeLayerHeightOverlay * $this.cakeSlices.length;
+            y = y - cakeLayerHeightOverlay * $this.cakeSlices[gameobj.game.cakesFinished].length;
 
             var s = new gameobj.Sprite(
                     x, y, 100, cakeLayerHeight,
@@ -27,15 +32,23 @@ objects = function(gameobj){
                     0, cakeLayerSourceHeight * type, cakeLayerSourceWidth, cakeLayerSourceHeight
             );
 
-            $this.cakeSlices.push(new gameobj.CakeSlice(s));
+            $this.cakeSlices[gameobj.game.cakesFinished].push(new gameobj.CakeSlice(s));
         };
 
         this.draw = function(ctx_cake_stack) {
             var i;
             for(i =0; i < $this.cakeSlices.length; i++) {
-                $this.cakeSlices[i].draw(ctx_cake_stack);
+                for(j =0; j < $this.cakeSlices[i].length; j++) {
+                    $this.cakeSlices[i][j].draw(ctx_cake_stack);
+                }
             }
         };
+
+        this.slideAway = function(cake_list) {
+            for(j =0; j < cake_list.length; j++) {
+                cake_list[j].slideAway();
+            }
+        }
 
     };
 
@@ -91,6 +104,11 @@ objects = function(gameobj){
         this.animation = null;
 
         this.draw = function(ctx) {
+            // If we have moved off the left of the screen dont draw anything
+            if ($this.coord.x + $this.width/2 < 0) {
+                return;
+            }
+
             var xPos = 0;
             var yPos = 0;
             if(this.animation){
@@ -232,6 +250,13 @@ objects = function(gameobj){
         
         this.draw = function(ctx){
             this.sprite.draw(ctx);
+        }
+
+        this.slideAway = function() {
+            this.sprite.animation = new gameobj.TransAnimation($this.sprite.coord,
+                                                                    new gameobj.Coords(-100, $this.sprite.coord.y),
+                                                                    gameobj.getDurationInFrames(1000));
+            this.sprite.animation.start();
         }
     };
 
