@@ -72,6 +72,7 @@ var whackacake = function all() {
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
+            $this.animatedText = [];
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
@@ -106,13 +107,18 @@ var whackacake = function all() {
 
             if (Math.random() < $this.spawnProbability) {
                 var cup = $this.getRandomCup()
-                    if (!cup.hasIngredient()) {
-                        cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
-                    }
-            }
+                if (!cup.hasIngredient()) {
+       	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
+       	   	    }
+       		}
             $this.cups.forEach(function(c) { c.updateState(); });
-        }
 
+            // Look at the first animatedText element - if it has finished we remove it.
+            if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
+                $this.animatedText.shift();
+            }
+       }
+        		
         this.mouseDown = function(e) {
             var mouseX = e.pageX;
             var mouseY = e.pageY;
@@ -146,19 +152,36 @@ var whackacake = function all() {
          **/
 
         this.canvasPressed = function(x,y) {        
-            var i;
-            for (i = 0; i < $this.cups.length; i++) {
-                if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
-                    $this.clickedIngredient($this.cups[i]);
-                }
-            }
+        	var i;
+        	for (i = 0; i < $this.cups.length; i++) {
+        	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
+        	        $this.clickedIngredient($this.cups[i], x, y);
+        	    }
+        	}
         }
 
 
-        this.clickedIngredient = function(cup) {
-            var type = cup.hasIngredient().getType();
-            $this.cakeStack.addToCakeStack(type);
-            $this.score += cup.hit();
+        this.clickedIngredient = function(cup,x, y) {
+            //var type = cup.hasIngredient().getType();
+            //$this.cakeStack.addToCakeStack(type);
+            var scoreToAdd = cup.hit();
+
+            var messageX = x - 50;
+            var messageY = y - 50;
+            var scoreMessage
+            if (scoreToAdd > 0) {
+                scoreMessage = "+"+scoreToAdd
+            } else {
+                scoreMessage = scoreToAdd
+            }
+            //animate score message popping up
+            var textAnimation = new my.TransAnimation(new my.Coords(messageX, messageY),
+                                                            new my.Coords(messageX, messageY - 50),
+                                                            my.getDurationInFrames(1000));
+
+            $this.animatedText.push( new my.AnimatedText( messageX, messageY, textAnimation, scoreToAdd ));
+            
+            $this.score += scoreToAdd;
         }
 
         this.loadImages = function() {
@@ -217,6 +240,7 @@ var whackacake = function all() {
             return new my.Ingredient(Math.floor(Math.random()*10));
         }
 
+
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
@@ -241,13 +265,22 @@ var whackacake = function all() {
                 $this.cups[i].draw($this.ctx);
             }
 
+            $this.ctx.font = "40pt Calibri";
+            for (i = 0; i < $this.animatedText.length; i++) {
+                $this.animatedText[i].draw($this.ctx);
+            }
+
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
 
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
 
         this.gameOver = function() {
-            alert("Game Over: "+$this.score);
+            var oldScore = $this.score;
+            if ($this.cakesFinished > 0) {
+                $this.score = $this.score * $this.cakesFinished
+            }
+            alert("Game Over: Score: "+oldScore + " X Cakes Made: "+$this.cakesFinished+" = Final Score: "+ $this.score);
         }
     }
 

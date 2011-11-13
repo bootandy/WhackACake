@@ -75,6 +75,33 @@ objects = function(gameobj){
     }
 
 
+    gameobj.AnimatedText = function(x, y, animation, str) {
+        var $this = this;
+        this.coord = new gameobj.Coords(x, y);
+        this.animation = animation;
+        this.animation.start();
+        this.str = str;
+
+        this.draw = function(ctx) {
+            drawCoord = this.animation.getLocation();
+            this.coord.x = drawCoord.x;
+            this.coord.y = drawCoord.y;
+
+            // If the animation has finished we dont draw it
+            if (this.animation.hasFinished()){
+                return true;
+            }
+
+            ctx.fillText($this.str, $this.coord.x, $this.coord.y );
+            return false;
+        }
+
+        // if the animation is finished mark this object for removal
+        this.isFinished = function() {
+            return this.animation.hasFinished();
+        }
+    }
+
     gameobj.Sprite = function(x, y, spriteImage) {
         var $this = this;
         this.coord = new gameobj.Coords(x, y);
@@ -275,9 +302,7 @@ objects = function(gameobj){
     	}
     	
     	this.hit = function() {
-			score = $this.ingredient.getScore();
-			this.ingredient.hit();
-			return score;
+			return this.ingredient.hit();
     	}
     	
     	this.hasIngredient = function(){
@@ -296,6 +321,7 @@ objects = function(gameobj){
 
         // getTime returns 40 - 0
         // expiryTime is in range: random(2000) + 2250 ->  250
+        this.createTime = new Date().getTime();
         this.expiryTime = new Date().getTime()
                 + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
         
@@ -320,19 +346,23 @@ objects = function(gameobj){
         }
     	
 
-        this.getScore = function() {
-            // TODO
-            return 5;
-        }
-
         this.hit = function() {
             this.wasHit = true;
+            gameobj.game.cakeStack.addToCakeStack(type_no);
+            if (type_no < 5) {
+                return 100 + $this.hitFastBonus();
+            } else {
+                return - 50;
+            }
+        }
+        
+        this.hitFastBonus = function() {
+            // up to a 100 point bonus for being quick
+            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 40 );
         }
 
-        this.getType = function() {
-            return type_no;
-        }
     }
+    
     gameobj.Background = function(width,height,backgroundImage){
     	var $this = this;
       $this.width = width;
