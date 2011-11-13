@@ -325,7 +325,6 @@ objects = function(gameobj){
     gameobj.Ingredient = function(type_no){
     	var $this = this;
     	this.type_no = type_no;
-    	console.log(type_no);
     	this.sprite = new gameobj.Sprite(null, null, gameobj.game.images["ingredient_"+type_no]);
     	this.visible = false;
 

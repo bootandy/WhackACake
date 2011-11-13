@@ -214,14 +214,14 @@ var whackacake = function all() {
                 var aud = document.createElement("audio");
                 aud.setAttribute("src", src);
                 aud.addEventListener('ended', function() {
-                    this.pause();
                     this.currentTime=0;
+                    this.pause();
                 });
                 return aud;
             }
             $this.sounds = {}
-            $this.sounds.good_hit = addSound("sound/good_hit.wav");
-            $this.sounds.bad_hit = addSound("sound/bad_hit.wav");
+            $this.sounds.good_hit = addSound("good_hit");
+            $this.sounds.bad_hit = addSound("bad_hit");
         }
 
         this.incrementCakes = function() {
