@@ -76,29 +76,29 @@ var whackacake = function all() {
             $this.loopInterval = 15;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability = $this.loopInterval / 1000;
+            $this.spawnProbability = 3/100;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
-            $this.ingredients = $this.createIngredients();
+            $this.animatedText = [];
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
             $this.timerDisplay = document.getElementById("timer");
+            $this.game = document.getElementById("game");
             $this.ctx = my.canvas.getContext('2d');
             $this.background = new my.Background(my.canvas.width,my.canvas.height,$this.images.background);
-            $this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50,50,$this.images.cursor);
+            $this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50, 50, $this.images.cursor);
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            my.canvas.addEventListener('mousemove', $this.cursor.setPosition);
+            $this.game.addEventListener('mousemove', $this.cursor.setPosition);
             //document.onmousemove = $this.cursor.setPosition;
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-
         }
 
 
@@ -123,7 +123,12 @@ var whackacake = function all() {
        	   	         cup.setIngredient(this.getRandomIngredient()); // Choose a random ingredient
        	   	    }
        		}
-			$this.cups.forEach(function(c) { c.updateState(); });
+            $this.cups.forEach(function(c) { c.updateState(); });
+
+            // Look at the first animatedText element - if it has finished we remove it.
+            if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
+                $this.animatedText.shift();
+            }
        }
         		
         this.mouseDown = function(e) {
@@ -136,7 +141,9 @@ var whackacake = function all() {
         }
         
         this.touchDown = function(e) {
-          if (!e) var e = event;
+          if (!e) {
+              var e = event;
+          }
           e.preventDefault();
           touchX = e.targetTouches[0].pageX - my.canvas.offsetLeft;
           touchY = e.targetTouches[0].pageY - my.canvas.offsetTop;
@@ -160,16 +167,33 @@ var whackacake = function all() {
         	var i;
         	for (i = 0; i < $this.cups.length; i++) {
         	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
-        	        $this.clickedIngredient($this.cups[i]);
+        	        $this.clickedIngredient($this.cups[i], x, y);
         	    }
         	}
         }
 
 
-        this.clickedIngredient = function(cup) {
-            var type = cup.hasIngredient().getType();
-            $this.cakeStack.addToCakeStack(type);
-            $this.score += cup.hit();
+        this.clickedIngredient = function(cup,x, y) {
+            //var type = cup.hasIngredient().getType();
+            //$this.cakeStack.addToCakeStack(type);
+            var scoreToAdd = cup.hit();
+
+            var messageX = x - 50;
+            var messageY = y - 50;
+            var scoreMessage
+            if (scoreToAdd > 0) {
+                scoreMessage = "+"+scoreToAdd
+            } else {
+                scoreMessage = scoreToAdd
+            }
+            //animate score message popping up
+            var textAnimation = new my.TransAnimation(new my.Coords(messageX, messageY),
+                                                            new my.Coords(messageX, messageY - 50),
+                                                            my.getDurationInFrames(1000));
+
+            $this.animatedText.push( new my.AnimatedText( messageX, messageY, textAnimation, scoreToAdd ));
+            
+            $this.score += scoreToAdd;
         }
 
         this.loadImages = function() {
@@ -184,8 +208,10 @@ var whackacake = function all() {
             $this.images.ingredients = addImage("images/ingredients.png", 50, 50);
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
-            $this.images.cakeLayers = new Image();
-            $this.images.cakeLayers.src = "images/cake_layers.png";
+            for (i=0; i<10; i++) {
+                $this.images["ingredient_"+i] = addImage("images/ing_"+i+".png", 50, 50);
+                $this.images["cake_layer_"+i] = addImage("images/cl_"+i+".png", 100, 50);
+            }
             $this.images.background = new Image;
             $this.images.background.src = "images/background.png";
             $this.images.cursor = new Image;
@@ -197,17 +223,6 @@ var whackacake = function all() {
             $this.cakesFinished++;
         }
 
-        this.createIngredients = function() {
-            var screenWidth = my.canvas.width;
-            var screenHeight = my.canvas.height;
-
-            var result = [];
-        	var ingredient = new my.Ingredient(new my.SpriteFromWidthHeightAndImage($this.images.choc));
-            result.push(ingredient);
-        	return result;
-
-        }
-
 
         this.createCups = function() {
             var screenWidth = my.canvas.width;
@@ -216,11 +231,11 @@ var whackacake = function all() {
             console.log('here');
 
             var result = new Array;
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage (screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(screenWidth / 2, screenHeight / 2, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
-            result.push(new my.Cup(new my.SpriteAtXYWithWidthHeightFromImage(3 * screenWidth / 4, 3 * screenHeight / 4, 50, 50, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 4, screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(3 * screenWidth / 4, screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 2, screenHeight / 2, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
+            result.push(new my.Cup(new my.Sprite(3 * screenWidth / 4, 3 * screenHeight / 4, $this.images.cup)));
             console.log(result);
             return result;
         }
@@ -233,6 +248,7 @@ var whackacake = function all() {
         this.getRandomIngredient = function() {
           return new my.Ingredient(Math.floor(Math.random()*10));
         }
+
 
         this.drawAll = function() {
 
@@ -257,14 +273,24 @@ var whackacake = function all() {
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
-            $this.cursor.draw($this.ctx);
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
+            $this.ctx.font = "40pt Calibri";
+            for (i = 0; i < $this.animatedText.length; i++) {
+                $this.animatedText[i].draw($this.ctx);
+            }
 
+            $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
+            
             $this.cakeStack.draw($this.ctx_cake_stack);
+            $this.cursor.draw($this.ctx, $this.ctx_cake_stack);
         }
 
         this.gameOver = function() {
-            alert("Game Over: "+$this.score);
+            var oldScore = $this.score;
+            if ($this.cakesFinished > 0) {
+                $this.score = $this.score * $this.cakesFinished
+            }
+            alert("Game Over: Score: "+oldScore + " X Cakes Made: "+$this.cakesFinished+" = Final Score: "+ $this.score);
         }
     }
     

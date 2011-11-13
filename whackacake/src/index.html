@@ -42,34 +42,37 @@
             border-top: 1px solid black;
             padding: 0;
             margin: 0;
+        }
+        #game {
             cursor: url(images/empty_cursor.png)        
         }
     </style>
 </head>
 
 <body onload="whackacake.init()">
-<div id='score_div' >
-    Score:<span id='game_score' >0</span>
-</div>
-<div id="cake_div">
-Cakes Made: <span id='cakes' >0</span>
-</div>
-<div id="time_div">
-Time: <span id='timer' >N/A</span>
-</div>
+  <div id='game'>
+    <div id='score_div' >
+        Score:<span id='game_score' >0</span>
+    </div>
+    <div id="cake_div">
+    Cakes Made: <span id='cakes' >0</span>
+    </div>
+    <div id="time_div">
+    Time: <span id='timer' >N/A</span>
+    </div>
 
-<canvas id="cake_stack" >
-</canvas>
+    <canvas id="cake_stack" >
+    </canvas>
 
-<canvas id="c">
-    <p>
-        sorry you need a modern browser
-    </p>
-</canvas>
+    <canvas id="c">
+        <p>
+            sorry you need a modern browser
+        </p>
+    </canvas>
 
-<div id="frame_div">
-Frames: <span id='frames' >0</span>
-</div>
-
+    <div id="frame_div">
+    Frames: <span id='frames' >0</span>
+    </div>
+  </div>
 </body>
 </html>
