@@ -16,13 +16,21 @@ if (!Object.prototype.forEach)
   };
 }
 
-
-
 var whackacake = function all() {
     my = {};
 
-
     my.init = function() {
+        var findPosition =function(obj){
+            var curleft = curtop = 0;
+            if (obj.offsetParent) {
+              do {
+                  curleft += obj.offsetLeft;
+                  curtop += obj.offsetTop;
+                 } while (obj = obj.offsetParent);
+            return [curleft,curtop];
+          }
+        }
+
         my.canvas = document.getElementById("c");
         my.canvas_cake_stack = document.getElementById("cake_stack");
         var screenWidth = 700;
@@ -35,6 +43,8 @@ var whackacake = function all() {
 
         my.canvas.height = screenHeight;
         my.canvas.width = screenWidth;
+        my.canvas.x = findPosition(my.canvas)[0];
+        my.canvas.y = findPosition(my.canvas)[1];
         my.canvas_cake_stack.height = screenHeight;
         my.canvas_cake_stack.width = cakeStackWidth;
 
@@ -79,12 +89,14 @@ var whackacake = function all() {
             $this.timerDisplay = document.getElementById("timer");
             $this.ctx = my.canvas.getContext('2d');
             $this.background = new my.Background(my.canvas.width,my.canvas.height,$this.images.background);
+            $this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50,50,$this.images.cursor);
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-
+            my.canvas.addEventListener('mousemove', $this.cursor.setPosition);
+            //document.onmousemove = $this.cursor.setPosition;
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
 
         }
@@ -176,7 +188,8 @@ var whackacake = function all() {
             $this.images.cakeLayers.src = "images/cake_layers.png";
             $this.images.background = new Image;
             $this.images.background.src = "images/background.png";
-
+            $this.images.cursor = new Image;
+            $this.images.cursor.src = "images/bat_up.png";
         }
 
 
@@ -244,7 +257,7 @@ var whackacake = function all() {
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
-
+            $this.cursor.draw($this.ctx);
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
 
             $this.cakeStack.draw($this.ctx_cake_stack);

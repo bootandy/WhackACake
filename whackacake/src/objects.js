@@ -340,10 +340,51 @@ objects = function(gameobj){
             var xPos = 0;
             var yPos = 0;
             ctx.drawImage(this.backgroundImage,
-            0,
-            0,
+            1,
+            1,
             this.width,
             this.height);
+      }
+    }
+    gameobj.Cursor = function(canvasX,canvasY,width,height,cursorImage){
+    	var $this = this;
+      $this.x = 0;
+      $this.y = 0;
+      $this.canvasX = canvasX;
+      $this.canvasY = canvasY;
+      $this.width = width;
+      $this.height = height;
+      $this.cursorImage = cursorImage;
+      $this.getCursorPosition = function(e) {
+        e = e || window.event;
+        var cursor = {x:0, y:0};
+        if (e.pageX || e.pageY) {
+            cursor.x = e.pageX;
+            cursor.y = e.pageY;
+        } 
+        else {
+            var de = document.documentElement;
+            var b = document.body;
+            cursor.x = e.clientX + 
+                (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+            cursor.y = e.clientY + 
+                (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+        }
+        return cursor;
+      }
+
+      $this.draw = function(ctx) {
+            ctx.drawImage(this.cursorImage,
+            this.x,
+            this.y,
+            this.width,
+            this.height);
+      }
+
+      $this.setPosition = function(e) {
+        var $mousePostion = $this.getCursorPosition(e);
+        $this.x = $mousePostion.x - $this.canvasX;
+        $this.y = $mousePostion.y - $this.canvasY;
       }
     }
 }
