@@ -49,7 +49,7 @@ var whackacake = function all() {
         my.canvas_cake_stack.width = cakeStackWidth;
 
 
-        console.debug("canvas: " + style);
+        //console.debug("canvas: " + style);
 
         my.game = new Game();
         my.game.init();
@@ -88,11 +88,10 @@ var whackacake = function all() {
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
             $this.timerDisplay = document.getElementById("timer");
-            $this.game = document.getElementById("game");
+            my.gameDiv = document.getElementById("game");
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-            $this.cursor = new my.Cursor($this.game);
-            $this.cursor = new my.Cursor($this.game, 60, 62, my.canvas, $this.images.cursor_down);
+            $this.cursor = new my.Cursor(60, 62, $this.images.cursor_down);
             $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -100,7 +99,7 @@ var whackacake = function all() {
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            $this.game.addEventListener('mousemove', $this.cursor.setPosition);
+            my.gameDiv.addEventListener('mousemove', $this.cursor.setPosition);
         }
 
 
