@@ -43,7 +43,8 @@ var whackacake = function all() {
 
         my.game = new Game();
         my.game.init();
-        my.game.loop();
+        my.loop = setInterval("my.game.loop()", my.game.loopInterval);
+
     }
 
     /**
@@ -63,7 +64,7 @@ var whackacake = function all() {
         this.init = function() {
             $this.score = 0;
             $this.cakesFinished = 0;
-            $this.loopInterval = 15;
+            $this.loopInterval = 30;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
             $this.spawnProbability = 3/100;
@@ -97,8 +98,8 @@ var whackacake = function all() {
             $this.drawAll();
 
             if (this.getTime() >= 0) {
-                setTimeout("whackacake.game.loop()", $this.loopInterval);
             } else {
+                clearInterval(my.loop);
                 this.gameOver();
             }
         }
@@ -168,7 +169,7 @@ var whackacake = function all() {
 
             var messageX = x - 50;
             var messageY = y - 50;
-            var scoreMessage
+            var scoreMessage;
             if (scoreToAdd > 0) {
                 scoreMessage = "+"+scoreToAdd
             } else {
