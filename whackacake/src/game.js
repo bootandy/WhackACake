@@ -162,8 +162,8 @@ var whackacake = function all() {
 
 
         this.clickedIngredient = function(cup,x, y) {
-            var type = cup.hasIngredient().getType();
-            $this.cakeStack.addToCakeStack(type);
+            //var type = cup.hasIngredient().getType();
+            //$this.cakeStack.addToCakeStack(type);
             var scoreToAdd = cup.hit();
 
             var messageX = x - 50;
@@ -234,6 +234,7 @@ var whackacake = function all() {
         this.getRandomIngredient = function() {
           return new my.Ingredient(Math.floor(Math.random()*10));
         }
+
 
         this.drawAll = function() {
 

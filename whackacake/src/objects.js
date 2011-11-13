@@ -345,7 +345,8 @@ objects = function(gameobj){
 
         this.hit = function() {
             this.wasHit = true;
-            if (type_no < 5) {
+            gameobj.game.cakeStack.addToCakeStack(type_no);
+            if (type_no > 4) {
                 return 100 + $this.hitFastBonus();
             } else {
                 return - 50;
@@ -354,12 +355,9 @@ objects = function(gameobj){
         
         this.hitFastBonus = function() {
             // up to a 100 point bonus for being quick
-            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 400 );
+            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 40 );
         }
 
-        this.getType = function() {
-            return type_no;
-        }
     }
     
     gameobj.Background = function(width,height,backgroundImage){
