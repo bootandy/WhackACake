@@ -318,11 +318,16 @@ objects = function(gameobj){
     	this.type_no = type_no
     	this.sprite = new gameobj.Sprite(null, null, 50, 50, gameobj.game.images.ingredients, 0, type_no*160, 212, 160);
     	this.visible = false;
-    	this.expiryTime = gameobj.frameCount + (2*1000.0)/gameobj.game.loopInterval;
+
+        // getTime returns 40 - 0
+        // expiryTime is in range: random(2000) + 2250 ->  250
+        this.expiryTime = new Date().getTime()
+                + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
+        
     	this.wasHit = false;
     	
     	this.isExpired = function(){
-    		if(this.wasHit || (this.expiryTime > 0 && gameobj.frameCount - this.expiryTime > 0)){
+    		if(this.wasHit || (this.expiryTime <  new Date().getTime())) {
     			return true;
     		}
     		return false;
@@ -339,9 +344,6 @@ objects = function(gameobj){
             $this.sprite.animation.start();
         }
     	
-        this.setMaxDisplayTime = function(value){
-            this.expiryTime = gameobj.frameCount + value;
-        }
 
         this.getScore = function() {
             // TODO

@@ -66,13 +66,12 @@ var whackacake = function all() {
             $this.loopInterval = 15;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability = $this.loopInterval / 1000;
+            $this.spawnProbability = 3/100;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
-            $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
@@ -124,7 +123,9 @@ var whackacake = function all() {
         }
         
         this.touchDown = function(e) {
-          if (!e) var e = event;
+          if (!e) {
+              var e = event;
+          }
           e.preventDefault();
           touchX = e.targetTouches[0].pageX - my.canvas.offsetLeft;
           touchY = e.targetTouches[0].pageY - my.canvas.offsetTop;
@@ -184,18 +185,6 @@ var whackacake = function all() {
             $this.cakesFinished++;
         }
 
-        this.createIngredients = function() {
-            var screenWidth = my.canvas.width;
-            var screenHeight = my.canvas.height;
-
-            var result = [];
-        	var ingredient = new my.Ingredient(new my.SpriteFromWidthHeightAndImage($this.images.choc));
-            result.push(ingredient);
-        	return result;
-
-        }
-
-
         this.createCups = function() {
             var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
@@ -246,7 +235,7 @@ var whackacake = function all() {
             }
 
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
-
+            
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
 
