@@ -84,8 +84,6 @@ var whackacake = function all() {
 							if (navigator.userAgent.match(/Android/i)) {
 							   my.isRunningOnAndroid = true;
 							}
-				
-        console.debug("canvas: " + style);
 
 
     }
