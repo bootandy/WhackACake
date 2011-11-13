@@ -358,7 +358,8 @@ objects = function(gameobj){
         // expiryTime is in range: random(2000) + 2250 ->  250
         this.createTime = new Date().getTime();
         this.expiryTime = new Date().getTime()
-                + parseInt(Math.random() * (gameobj.game.getTime() * 50)) + gameobj.game.getTime() * 50 + 250;
+                + parseInt(Math.random() * (gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom))
+                + gameobj.game.getTime() * gameobj.config.ingredientStaysTimeRandom + gameobj.config.ingredientstaysTimeConstant;
         
     	this.wasHit = false;
     	
@@ -386,16 +387,21 @@ objects = function(gameobj){
             gameobj.game.cakeStack.addToCakeStack(type_no);
             if (type_no < 5) {
                 gameobj.game.sounds.good_hit.play();
-                return gameobj.config.badScore + $this.hitFastBonus();
+                return gameobj.config.goodScore + $this.hitFastBonus();
             } else {
                 gameobj.game.sounds.bad_hit.play();
-                return gameobj.config.goodScore + $this.hitFastBonus();
+                return gameobj.config.badScore; // + $this.hitFastBonus();
             }
         }
         
         this.hitFastBonus = function() {
             // up to a 100 point bonus for being quick
-            return parseInt( Math.max(this.createTime - new Date().getTime()  + 4000, 0) / 40 );
+            return parseInt(
+                        Math.max(
+                            this.createTime
+                            - new Date().getTime()
+                            + (gameobj.config.ingredientStaysTimeRandom * 2 *  gameobj.config.gameTime), 0)
+                    / gameobj.config.gameTime );
         }
 
     }
@@ -409,10 +415,55 @@ objects = function(gameobj){
             var xPos = 0;
             var yPos = 0;
             ctx.drawImage(this.backgroundImage,
-            0,
-            0,
+            1,
+            1,
             this.width,
             this.height);
+      }
+    }
+    gameobj.Cursor = function(width,height, cursorImage){
+    	var $this = this;
+      $this.x = 1;
+      $this.y = 1;
+      $this.width = width;
+      $this.height = height;
+      $this.state = "up";
+      $this.cursorImage = cursorImage;
+      $this.frameDown = 0;
+      $this.reset = function(){
+        if($this.state == "down") {
+          $this.state = "up";
+          gameobj.gameDiv.setAttribute('class', "cursor_up");
+        }
+      };
+      $this.updateState = function(){
+        if( gameobj.frameCount >  $this.resetFrame ) {
+          $this.reset();
+        }
+      };
+      $this.down = function(){
+         if($this.state == "up") {
+            $this.state = "down";
+            $this.resetFrame = gameobj.frameCount + gameobj.getDurationInFrames(240);
+            gameobj.gameDiv.setAttribute('class', "cursor_down"); 
+         }
+      };
+      
+      $this.draw = function(ctx) {
+            if( $this.state == "down" ) { 
+              ctx.drawImage(this.cursorImage,
+              $this.x,
+              $this.y,
+              this.width,
+              this.height);
+            }
+      };
+      $this.setPosition = function(e){
+            var mousePosition = gameobj.getMousePosition(e);
+            var mouseX = mousePosition.x;
+            var mouseY = mousePosition.y;
+            $this.x = mouseX -gameobj.canvas.offsetLeft;
+            $this.y = mouseY -gameobj.canvas.offsetTop;
       }
     }
 }

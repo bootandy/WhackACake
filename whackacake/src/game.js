@@ -49,13 +49,31 @@ var whackacake = function all() {
     my = {};
     my.config = {
         spawnProbability:3/100,
-        gameOverCallback:function(score){},
+        gameTime:41,
+        ingredientStaysTimeRandom:50,
+        ingredientstaysTimeConstant:250,
         goodScore:100,
         badScore:-100,
+        
+        gameOverCallback:function(score){}
     };
+
+    /*my.init = function() {
+        
+        }*/
 
 
     my.init = function(config) {
+        var findPosition =function(obj){
+            var curleft = curtop = 0;
+            if (obj.offsetParent) {
+              do {
+                  curleft += obj.offsetLeft;
+                  curtop += obj.offsetTop;
+                 } while (obj = obj.offsetParent);
+            return [curleft,curtop];
+          }
+        }
         my.config = merge(my.config, config);
         my.canvas = document.getElementById("main_canvas");
         my.canvas_cake_stack = document.getElementById("cake_stack");
@@ -69,6 +87,8 @@ var whackacake = function all() {
 
         my.canvas.height = screenHeight;
         my.canvas.width = screenWidth;
+        my.canvas.x = findPosition(my.canvas)[0];
+        my.canvas.y = findPosition(my.canvas)[1];
         my.canvas_cake_stack.height = screenHeight;
         my.canvas_cake_stack.width = cakeStackWidth;
 
@@ -86,7 +106,6 @@ var whackacake = function all() {
 							if (navigator.userAgent.match(/Android/i)) {
 							   my.isRunningOnAndroid = true;
 							}
-
 
     }
 
@@ -121,7 +140,23 @@ var whackacake = function all() {
 			return milliseconds/my.game.loopInterval;
     }
 
-
+    my.getMousePosition = function(e) {
+      e = e || window.event;
+      var cursor = {x:0, y:0};
+      if (e.pageX || e.pageY) {
+          cursor.x = e.pageX;
+          cursor.y = e.pageY;
+      } 
+      else {
+          var de = document.documentElement;
+          var b = document.body;
+          cursor.x = e.clientX + 
+              (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
+          cursor.y = e.clientY + 
+              (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+      }
+      return cursor;
+    }
 
     ///---------------- objects ----------------
 
@@ -146,18 +181,20 @@ var whackacake = function all() {
             
             //horrible hack to allow multiple games without refresh
             $this.timerDisplay = document.getElementById("timer");
+            my.gameDiv = document.getElementById("game");
             $this.timerDisplay.setAttribute("style", ""); 
 
             $this.ctx = my.canvas.getContext('2d');
+            $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
+            $this.cursor = new my.Cursor(60, 62, $this.images.cursor_down);
+            $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
-            my.canvas.addEventListener('click', $this.mouseDown);
+            my.canvas.addEventListener('click', $this.mouseDown,false);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-
-            $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-
+            my.canvas.addEventListener('mousemove', $this.cursor.setPosition);
         }
 
 
@@ -183,7 +220,7 @@ var whackacake = function all() {
                     }
             }
             $this.cups.forEach(function(c) { c.updateState(); });
-
+            $this.cursor.updateState();
             // Look at the first animatedText element - if it has finished we remove it.
             if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
                 $this.animatedText.shift();
@@ -191,11 +228,12 @@ var whackacake = function all() {
         }
 
         this.mouseDown = function(e) {
-            var mouseX = e.pageX;
-            var mouseY = e.pageY;
+            var mousePosition = my.getMousePosition(e);
+            var mouseX = mousePosition.x;
+            var mouseY = mousePosition.y;
             mouseX -= my.canvas.offsetLeft;
             mouseY -= my.canvas.offsetTop;
-
+            $this.cursor.down()
             $this.canvasPressed(mouseX, mouseY);
         }
 
@@ -212,7 +250,7 @@ var whackacake = function all() {
         }
 
         this.getTime = function() {
-            return 41 - (new Date().getTime() - $this.startTime) /1000;
+            return my.config.gameTime - (new Date().getTime() - $this.startTime) /1000;
         }
 
 
@@ -273,9 +311,7 @@ var whackacake = function all() {
                 $this.images["ingredient_"+i] = addImage("images/ing_"+i+".png", 130, 90);
                 $this.images["cake_layer_"+i] = addImage("images/cl_"+i+".png", 100, 50);
             }
-            $this.images.background = new Image;
-            $this.images.background.src = "images/background_right.png";
-            $this.images.background_left = addImage("images/background_left.png");
+            $this.images.cursor_down =  addImage("images/bat_down.png");
         }
         
         
@@ -336,7 +372,7 @@ var whackacake = function all() {
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
-            //$this.background.draw($this.ctx);
+            //$this.background_right.draw($this.ctx);
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
             this.cakesDisplay.innerHTML = $this.cakesFinished;
@@ -356,14 +392,15 @@ var whackacake = function all() {
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
-
+            $this.cursor.draw($this.ctx);
+            $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
             $this.ctx.font = "40pt ARia";
             for (i = 0; i < $this.animatedText.length; i++) {
                 $this.animatedText[i].draw($this.ctx);
             }
 
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
-
+            //$this.background_left.draw($this.ctx_cake_stack);
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
 
