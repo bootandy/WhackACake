@@ -216,8 +216,8 @@ var whackacake = function all() {
             var screenWidth = my.canvas.width;
             var screenHeight = my.canvas.height;
 
-            positions = [[screenWidth / 4, screenHeight / 4],
-                      [3 * screenWidth / 4, screenHeight / 4],
+            positions = [[screenWidth / 4 + 20, screenHeight / 4 + 50],
+                      [3 * screenWidth / 4 - 20, screenHeight / 4 + 50],
                       [screenWidth / 2, screenHeight / 2],
                       [screenWidth / 4, 3 * screenHeight / 4],
                       [3 * screenWidth / 4, 3 * screenHeight / 4]]
