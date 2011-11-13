@@ -74,6 +74,33 @@ objects = function(gameobj){
     }
 
 
+    gameobj.AnimatedText = function(x, y, animation, str) {
+        var $this = this;
+        this.coord = new gameobj.Coords(x, y);
+        this.animation = animation;
+        this.animation.start();
+        this.str = str;
+
+        this.draw = function(ctx) {
+            drawCoord = this.animation.getLocation();
+            this.coord.x = drawCoord.x;
+            this.coord.y = drawCoord.y;
+
+            // If the animation has finished we dont draw it
+            if (this.animation.hasFinished()){
+                return true;
+            }
+
+            ctx.fillText($this.str, $this.coord.x, $this.coord.y );
+            return false;
+        }
+
+        // if the animation is finished mark this object for removal
+        this.isFinished = function() {
+            return this.animation.hasFinished();
+        }
+    }
+
     gameobj.Sprite = function(x, y, spriteImage) {
         var $this = this;
         this.coord = new gameobj.Coords(x, y);
