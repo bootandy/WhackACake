@@ -346,7 +346,7 @@ objects = function(gameobj){
         this.hit = function() {
             this.wasHit = true;
             gameobj.game.cakeStack.addToCakeStack(type_no);
-            if (type_no > 4) {
+            if (type_no < 5) {
                 return 100 + $this.hitFastBonus();
             } else {
                 return - 50;
