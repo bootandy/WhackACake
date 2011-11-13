@@ -1,0 +1,2 @@
+#!/bin/bash
+seq 0 9 | awk "{ print \"convert cake_layers.png -crop 300x154+0+\" \$0*154 \" cl_\" \$0 \".png\" }" | bash
