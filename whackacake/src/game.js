@@ -92,6 +92,7 @@ var whackacake = function all() {
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
             $this.cursor = new my.Cursor($this.game);
+            $this.cursor = new my.Cursor($this.game, 60, 62, my.canvas, $this.images.cursor_down);
             $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -99,7 +100,7 @@ var whackacake = function all() {
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            $this.game.addEventListener('mousemove', $this.cursor.reset);
+            $this.game.addEventListener('mousemove', $this.cursor.setPosition);
         }
 
 
@@ -125,7 +126,7 @@ var whackacake = function all() {
        	   	    }
        		}
             $this.cups.forEach(function(c) { c.updateState(); });
-
+            $this.cursor.updateState();
             // Look at the first animatedText element - if it has finished we remove it.
             if ($this.animatedText.length > 0 && $this.animatedText[0].isFinished()) {
                 $this.animatedText.shift();
@@ -137,9 +138,8 @@ var whackacake = function all() {
             var mouseY = e.pageY;
             mouseX -= my.canvas.offsetLeft;
             mouseY -= my.canvas.offsetTop;
-
-            $this.canvasPressed(mouseX, mouseY);
             $this.cursor.down()
+            $this.canvasPressed(mouseX, mouseY);
         }
 
         this.touchDown = function(e) {
@@ -215,10 +215,7 @@ var whackacake = function all() {
                 $this.images["ingredient_"+i] = addImage("images/ing_"+i+".png", 130, 90);
                 $this.images["cake_layer_"+i] = addImage("images/cl_"+i+".png", 100, 50);
             }
-            $this.images.background_right = new Image;
-            $this.images.background_left = new Image;
-            $this.images.background_right = addImage("images/background_right.png");
-            $this.images.background_left =  addImage("images/background_left.png");
+            $this.images.cursor_down =  addImage("images/bat_down.png");
         }
 
 
@@ -279,6 +276,7 @@ var whackacake = function all() {
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
+            $this.cursor.draw($this.ctx);
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
             $this.ctx.font = "40pt Calibri";
             for (i = 0; i < $this.animatedText.length; i++) {

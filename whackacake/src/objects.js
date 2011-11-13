@@ -388,22 +388,50 @@ objects = function(gameobj){
             this.height);
       }
     }
-    gameobj.Cursor = function(game){
+    gameobj.Cursor = function(game,width,height,canvas, cursorImage){
     	var $this = this;
+      $this.x = 1;
+      $this.y = 1;
+      $this.width = width;
+      $this.height = height;
       $this.state = "up";
+      $this.cursorImage = cursorImage;
+      $this.frameDown = 0;
       $this.reset = function(){
         if($this.state == "down") {
           $this.state = "up";
           game.setAttribute('class', "cursor_up");
         }
       };
-
+      $this.updateState = function(){
+        if( gameobj.frameCount >  $this.resetFrame ) {
+          $this.reset();
+        }
+      };
       $this.down = function(){
          if($this.state == "up") {
-           $this.state = "down";
-           game.setAttribute('class', "cursor_down"); 
+            $this.state = "down";
+            $this.resetFrame = gameobj.frameCount + gameobj.getDurationInFrames(240);
+            game.setAttribute('class', "cursor_down"); 
          }
       };
+      
+      $this.draw = function(ctx) {
+            if( $this.state == "down" ) { 
+              ctx.drawImage(this.cursorImage,
+              $this.x,
+              $this.y,
+              this.width,
+              this.height);
+              //$this.reset(); this is to quick we need reset bat after little bit delay
+            }
+      };
+      $this.setPosition = function(e){
+            var mouseX = e.pageX;
+            var mouseY = e.pageY;
+            $this.x = mouseX -canvas.offsetLeft;
+            $this.y = mouseY -canvas.offsetTop;
+      }
     }
 }
 
