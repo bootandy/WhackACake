@@ -49,7 +49,9 @@ var whackacake = function all() {
     my = {};
     my.config = {
         spawnProbability:3/100,
-        gameOverCallback:function(score){}
+        gameOverCallback:function(score){},
+        goodScore:100,
+        badScore:-100,
     };
 
 
@@ -98,6 +100,12 @@ var whackacake = function all() {
 
     my.setSpawnProb = function(value){
         my.config.spawnProbability = value;
+    }
+    my.setGoodScore = function(value){
+        my.config.goodScore = value;
+    }
+    my.setBadScore = function(value){
+        my.config.badScore = value;
     }
 
 

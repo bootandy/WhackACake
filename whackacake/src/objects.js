@@ -147,8 +147,8 @@ objects = function(gameobj){
         }
 
         this.isClickedOn = function(x, y) {
-            if (( $this.coord.x - $this.width < x && $this.coord.x + $this.width > x )
-                    && ( $this.coord.y - $this.height < y && $this.coord.y + $this.height > y )) {
+            if (( $this.coord.x - $this.width /2 < x && $this.coord.x + $this.width / 2 > x )
+                    && ( $this.coord.y - $this.height /2 < y && $this.coord.y + $this.height / 2 > y )) {
                 return true;
             }
             return false;
@@ -370,9 +370,9 @@ objects = function(gameobj){
             this.wasHit = true;
             gameobj.game.cakeStack.addToCakeStack(type_no);
             if (type_no < 5) {
-                return 100 + $this.hitFastBonus();
+                return gameobj.config.goodScore + $this.hitFastBonus();
             } else {
-                return - 50;
+                return gameobj.config.badScore;
             }
         }
         
