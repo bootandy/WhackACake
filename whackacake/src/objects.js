@@ -283,8 +283,9 @@ objects = function(gameobj){
     	this.ingredient = null;
     	
     	this.setIngredient = function(ingredient){
-            ingredient.setAnimation($this.getIngredientAnimation());
+            // ingredient.setAnimation($this.getIngredientAnimation());
             $this.ingredient = ingredient;
+						$this.ingredient.sprite.coord = $this.sprite.coord.clone();
    	    }
 
         this.getIngredientAnimation = function(){

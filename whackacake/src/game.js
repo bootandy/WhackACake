@@ -266,7 +266,7 @@ var whackacake = function all() {
                 $this.cups[i].draw($this.ctx);
             }
 
-            $this.ctx.font = "40pt Calibri";
+            $this.ctx.font = "40pt ARia";
             for (i = 0; i < $this.animatedText.length; i++) {
                 $this.animatedText[i].draw($this.ctx);
             }
