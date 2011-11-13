@@ -25,8 +25,8 @@ var whackacake = function all() {
     my.init = function() {
         my.canvas = document.getElementById("c");
         my.canvas_cake_stack = document.getElementById("cake_stack");
-        var screenWidth = 500;
-        var screenHeight = 400;
+        var screenWidth = 700;
+        var screenHeight = 600;
         var cakeStackWidth = 100;
 
         var style = my.canvas.getAttribute("style");
@@ -59,11 +59,15 @@ var whackacake = function all() {
     var Game = function() {
         var $this = this;
 
+        this.incrementCakes = function() {
+            $this.cakesFinished++;
+        }
         this.init = function() {
             $this.score = 0;
-            $this.loopInterval = 15
+            $this.cakesFinished = 0;
+            $this.loopInterval = 15;
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability =   $this.loopInterval / 1000
+            $this.spawnProbability =   $this.loopInterval / 1000;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -72,6 +76,7 @@ var whackacake = function all() {
             $this.ingredients = $this.createIngredients();
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
+            $this.cakesDisplay = document.getElementById("cakes");
             $this.ctx = my.canvas.getContext('2d');
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
@@ -206,11 +211,14 @@ var whackacake = function all() {
 
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
+            this.cakesDisplay.innerHTML = $this.cakesFinished;
 
             var i;
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
             }
+
+            $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
 
             $this.cakeStack.draw($this.ctx_cake_stack);
         }
