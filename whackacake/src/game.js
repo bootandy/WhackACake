@@ -78,6 +78,7 @@ var whackacake = function all() {
             $this.cakesDisplay = document.getElementById("cakes");
             $this.timerDisplay = document.getElementById("timer");
             $this.ctx = my.canvas.getContext('2d');
+            $this.background = new my.Background(my.canvas.width,my.canvas.height,$this.images.background);
             my.canvas.addEventListener('click', $this.mouseDown);
             my.canvas.addEventListener("touchstart", $this.touchDown, false);
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
@@ -173,6 +174,8 @@ var whackacake = function all() {
             $this.images.choc.src = "images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
+            $this.images.background = new Image;
+            $this.images.background.src = "images/background.png";
 
         }
 
@@ -221,7 +224,7 @@ var whackacake = function all() {
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
-
+            $this.background.draw($this.ctx);
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
             this.cakesDisplay.innerHTML = $this.cakesFinished;
