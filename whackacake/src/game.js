@@ -283,7 +283,7 @@ var whackacake = function all() {
             var addSound = function(src) {
                 var aud = document.createElement("audio");
                 // Set source files for audio
-                [".mp3", ".wav", ".ogg"].forEach(function(ext) {
+                [".mp3", ".ogg"].forEach(function(ext) {
                     var src_el = document.createElement("source");
                     src_el.setAttribute("src", src+ext);
                     aud.appendChild(src_el);
