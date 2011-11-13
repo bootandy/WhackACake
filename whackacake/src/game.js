@@ -90,8 +90,6 @@ var whackacake = function all() {
 							if (navigator.userAgent.match(/Android/i)) {
 							   my.isRunningOnAndroid = true;
 							}
-				
-        console.debug("canvas: " + style);
 
 
     }
@@ -141,7 +139,7 @@ var whackacake = function all() {
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
             my.frameCount = 0;
-            $this.images = {};
+            $this.loadSounds();
             $this.loadImages();
             $this.cakeStack = new my.CakeStack($this.images.cakeLayers);
             $this.cups = this.createCups();
@@ -269,6 +267,7 @@ var whackacake = function all() {
                 im.height = height;
                 return im;
             }
+            $this.images={}
             $this.images.cup = addImage("images/bowl_back.png", 150, 100);
             $this.images.cupFront = addImage("images/bowl_front.png", 150, 100);
             $this.images.ingredients = addImage("images/ingredients.png", 150, 150);
@@ -282,7 +281,27 @@ var whackacake = function all() {
             $this.images.background.src = "images/background_right.png";
             $this.images.background_left = addImage("images/background_left.png");
         }
-
+        
+        
+        this.loadSounds = function() {
+            var addSound = function(src) {
+                var aud = document.createElement("audio");
+                // Set source files for audio
+                [".mp3", ".wav", ".ogg"].forEach(function(ext) {
+                    var src_el = document.createElement("source");
+                    src_el.setAttribute("src", src+ext);
+                    aud.appendChild(src_el);
+                });
+                aud.addEventListener('ended', function() {
+                    this.currentTime=0;
+                    this.pause();
+                });
+                return aud;
+            }
+            $this.sounds = {}
+            $this.sounds.good_hit = addSound("sound/good_hit");
+            $this.sounds.bad_hit = addSound("sound/bad_hit");
+        }
 
         this.incrementCakes = function() {
             $this.cakesFinished++;

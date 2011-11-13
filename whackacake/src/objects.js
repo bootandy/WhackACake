@@ -351,7 +351,6 @@ objects = function(gameobj){
     gameobj.Ingredient = function(type_no){
     	var $this = this;
     	this.type_no = type_no;
-    	console.log(type_no);
     	this.sprite = new gameobj.Sprite(null, null, gameobj.game.images["ingredient_"+type_no]);
     	this.visible = false;
 
@@ -387,9 +386,11 @@ objects = function(gameobj){
             this.wasHit = true;
             gameobj.game.cakeStack.addToCakeStack(type_no);
             if (type_no < 5) {
-                return gameobj.config.goodScore + $this.hitFastBonus();
+                gameobj.game.sounds.good_hit.play();
+                return gameobj.config.badScore + $this.hitFastBonus();
             } else {
-                return gameobj.config.badScore;
+                gameobj.game.sounds.bad_hit.play();
+                return gameobj.config.goodScore + $this.hitFastBonus();
             }
         }
         
