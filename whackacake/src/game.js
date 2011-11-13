@@ -38,7 +38,21 @@ var whackacake = function all() {
         my.canvas_cake_stack.height = screenHeight;
         my.canvas_cake_stack.width = cakeStackWidth;
 
-
+				/**
+				* User agent matching to detect iOS devices and Android devices
+				* Currently used to adjust animation duration
+				**/
+				
+				my.isRunningOnIos = false;
+				my.isRunningOnAndroid = false;
+				if (navigator.userAgent.match(/like Mac OS X/i)) {
+				   my.isRunningOnIos = true;
+				}
+				
+							if (navigator.userAgent.match(/Android/i)) {
+							   my.isRunningOnAndroid = true;
+							}
+				
         console.debug("canvas: " + style);
 
         my.game = new Game();
@@ -49,9 +63,16 @@ var whackacake = function all() {
 
     /**
      * Returns the number of frames required for a delay of a given time
+		 * Adjusts according to device type
      */
+
     my.getDurationInFrames = function(milliseconds){
-        return milliseconds / my.game.loopInterval;
+		if (my.isRunningOnIos)
+        return milliseconds / my.game.loopInterval/2;
+		else if (my.isRunningOnAndroid)
+			return milliseconds/my.game.loopInterval/5;
+		else
+			return milliseconds/my.game.loopInterval;
     }
 
 
