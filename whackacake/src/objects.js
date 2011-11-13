@@ -324,11 +324,9 @@ objects = function(gameobj){
 
         this.hit = function() {
             this.wasHit = true;
+            gameobj.game.addCakeLayer(type_no);
         }
 
-        this.getType = function() {
-            return type_no;
-        }
     }
     gameobj.Background = function(width,height,backgroundImage){
     	var $this = this;

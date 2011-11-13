@@ -149,17 +149,11 @@ var whackacake = function all() {
         	var i;
         	for (i = 0; i < $this.cups.length; i++) {
         	    if ($this.cups[i].sprite.isClickedOn(x, y) && $this.cups[i].hasIngredient()) {
-        	        $this.clickedIngredient($this.cups[i]);
+                    $this.score += this.cups[i].hit();
         	    }
         	}
         }
 
-
-        this.clickedIngredient = function(cup) {
-            var type = cup.hasIngredient().getType();
-            $this.cakeStack.addToCakeStack(type);
-            $this.score += cup.hit();
-        }
 
         this.loadImages = function() {
             var addImage = function(src, width, height) {
@@ -210,6 +204,10 @@ var whackacake = function all() {
         
         this.getRandomIngredient = function() {
           return new my.Ingredient(Math.floor(Math.random()*10));
+        }
+
+        this.addCakeLayer = function(type) {
+            $this.cakeStack.addToCakeStack(type);
         }
 
         this.drawAll = function() {
