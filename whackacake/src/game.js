@@ -54,20 +54,19 @@ var whackacake = function all() {
     }
 
 
+
     ///---------------- objects ----------------
 
     var Game = function() {
         var $this = this;
 
-        this.incrementCakes = function() {
-            $this.cakesFinished++;
-        }
         this.init = function() {
             $this.score = 0;
             $this.cakesFinished = 0;
             $this.loopInterval = 15;
+            $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
-            $this.spawnProbability =   $this.loopInterval / 1000;
+            $this.spawnProbability = $this.loopInterval / 1000;
             my.frameCount = 0;
             $this.images = {};
             $this.loadImages();
@@ -77,6 +76,7 @@ var whackacake = function all() {
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
+            $this.timerDisplay = document.getElementById("timer");
             $this.ctx = my.canvas.getContext('2d');
             $this.background = new my.Background(my.canvas.width,my.canvas.height,$this.images.background);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -95,7 +95,12 @@ var whackacake = function all() {
             my.frameCount++;
             $this.updateState();
             $this.drawAll();
-            setTimeout("whackacake.game.loop()", $this.loopInterval);
+            
+            if (this.getTime() >= 0) {
+                setTimeout("whackacake.game.loop()", $this.loopInterval);
+            } else {
+                this.gameOver();
+            }
         }
         
         this.updateState = function(){
@@ -127,7 +132,12 @@ var whackacake = function all() {
           $this.canvasPressed(touchX,touchY);
 
         }
-        
+
+        this.getTime = function() {
+            return 41 - (new Date().getTime() - $this.startTime) /1000;
+        }
+
+
        /** 
        This function determines which sprite was clicked
        and takes relevant action. The x,y parameters are passed by
@@ -142,8 +152,7 @@ var whackacake = function all() {
         	    }
         	}
         }
-        
- 
+
 
         this.clickedIngredient = function(cup) {
             var type = cup.hasIngredient().getType();
@@ -152,18 +161,28 @@ var whackacake = function all() {
         }
 
         this.loadImages = function() {
-            $this.images.cup = new Image();
-            $this.images.cup.src = "images/cup.jpeg";
+            var addImage = function(src, width, height) {
+                var im = new Image();
+                im.src = src;
+                im.width = width;
+                im.height = height;
+                return im;
+            }
+            $this.images.cup = addImage("images/cup.jpeg", 50, 50);
+            $this.images.ingredients = addImage("images/ingredients.png", 50, 50);
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
-            $this.images.ingredients = new Image;
-            $this.images.ingredients.src = "images/ingredients.png";
             $this.images.background = new Image;
             $this.images.background.src = "images/background.png";
+
         }
 
+
+        this.incrementCakes = function() {
+            $this.cakesFinished++;
+        }
 
         this.createIngredients = function() {
             var screenWidth = my.canvas.width;
@@ -210,6 +229,17 @@ var whackacake = function all() {
             this.frameDisplay.innerHTML = my.frameCount;
             this.cakesDisplay.innerHTML = $this.cakesFinished;
 
+            var timeLeft = parseInt($this.getTime());
+
+            // If < 10 seconds - bigger timer text & red color
+            if (timeLeft <= 10) {
+                var fontSize = parseInt( (100) - (timeLeft*7) );
+                var style = "color:#F00;"
+                            + " font-size:"+ fontSize +";";
+                this.timerDisplay.setAttribute("style", style);
+            }
+            this.timerDisplay.innerHTML = timeLeft;
+
             var i;
             for (i = 0; i < $this.cups.length; i++) {
                 $this.cups[i].draw($this.ctx);
@@ -218,6 +248,10 @@ var whackacake = function all() {
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
 
             $this.cakeStack.draw($this.ctx_cake_stack);
+        }
+
+        this.gameOver = function() {
+            alert("Game Over: "+$this.score);
         }
     }
     
