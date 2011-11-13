@@ -46,6 +46,22 @@ objects = function(gameobj){
         };
 
         this.slideAway = function(cake_list) {
+
+            var x = 0; //cake_list[cake_list.length-1].sprite.coord.x - 100;
+            var y = cake_list[cake_list.length-1].sprite.coord.y;
+
+            //animate score message popping up
+            var textAnimation = new my.TransAnimation(
+                    new my.Coords(x, y ),
+                    new my.Coords(x, y - 200),
+                    my.getDurationInFrames(4000));
+
+            gameobj.game.animatedText.push( new my.AnimatedText(
+                    x,
+                    y,
+                    textAnimation,
+                     (gameobj.game.cakesFinished + 1) +" X" ));
+
             for(j =0; j < cake_list.length; j++) {
                 cake_list[j].slideAway();
             }
