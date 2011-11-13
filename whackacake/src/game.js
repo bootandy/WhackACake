@@ -91,7 +91,7 @@ var whackacake = function all() {
             $this.game = document.getElementById("game");
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-            //$this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50, 50, $this.images.cursor);
+            $this.cursor = new my.Cursor($this.game);
             $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -99,7 +99,7 @@ var whackacake = function all() {
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            //$this.game.addEventListener('mousemove', $this.cursor.setPosition);
+            $this.game.addEventListener('mousemove', $this.cursor.reset);
         }
 
 
@@ -139,6 +139,7 @@ var whackacake = function all() {
             mouseY -= my.canvas.offsetTop;
 
             $this.canvasPressed(mouseX, mouseY);
+            $this.cursor.down()
         }
 
         this.touchDown = function(e) {
@@ -216,8 +217,6 @@ var whackacake = function all() {
             }
             $this.images.background_right = new Image;
             $this.images.background_left = new Image;
-            $this.images.cursor = new Image;
-            $this.images.cursor.src = "images/bat_up.png";
             $this.images.background_right = addImage("images/background_right.png");
             $this.images.background_left =  addImage("images/background_left.png");
         }
@@ -289,7 +288,6 @@ var whackacake = function all() {
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
             //$this.background_left.draw($this.ctx_cake_stack);
             $this.cakeStack.draw($this.ctx_cake_stack);
-            $this.cursor.draw($this.ctx, $this.ctx_cake_stack);
         }
 
         this.gameOver = function() {

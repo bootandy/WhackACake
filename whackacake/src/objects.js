@@ -388,54 +388,22 @@ objects = function(gameobj){
             this.height);
       }
     }
-    gameobj.Cursor = function(canvasX,canvasY,width,height,cursorImage){
+    gameobj.Cursor = function(game){
     	var $this = this;
-      $this.x = 0;
-      $this.y = 0;
-      $this.canvasX = canvasX;
-      $this.canvasY = canvasY;
-      $this.width = width;
-      $this.height = height;
-      $this.cursorImage = cursorImage;
-      $this.getCursorPosition = function(e) {
-        e = e || window.event;
-        var cursor = {x:0, y:0};
-        if (e.pageX || e.pageY) {
-            cursor.x = e.pageX;
-            cursor.y = e.pageY;
-        } 
-        else {
-            var de = document.documentElement;
-            var b = document.body;
-            cursor.x = e.clientX + 
-                (de.scrollLeft || b.scrollLeft) - (de.clientLeft || 0);
-            cursor.y = e.clientY + 
-                (de.scrollTop || b.scrollTop) - (de.clientTop || 0);
+      $this.state = "up";
+      $this.reset = function(){
+        if($this.state == "down") {
+          $this.state = "up";
+          game.setAttribute('class', "cursor_up");
         }
-        return cursor;
-      }
+      };
 
-      $this.draw = function(ctx, ctx_cakes) {
-            if( this.x < $this.canvasX ) { 
-              ctx_cakes.drawImage(this.cursorImage,
-              this.x,
-              this.y,
-              this.width,
-              this.height);
-            } else {
-              ctx.drawImage(this.cursorImage,
-              this.x - $this.canvasX,
-              this.y - $this.canvasY,
-              this.width,
-              this.height);
-            }
-      }
-
-      $this.setPosition = function(e) {
-        var $mousePostion = $this.getCursorPosition(e);
-        $this.x = $mousePostion.x ;
-        $this.y = $mousePostion.y - $this.canvasY;
-      }
+      $this.down = function(){
+         if($this.state == "up") {
+           $this.state = "down";
+           game.setAttribute('class', "cursor_down"); 
+         }
+      };
     }
 }
 

@@ -47,15 +47,19 @@
             background:url("images/background_right.png");
             float:left;
         }
-        #game {
+        #game.cursor_up {
             cursor: url("images/bat_up.png");
         }
+        #game.cursor_down {
+            cursor: url("images/bat_down.png");
+        }
+
         
     </style>
 </head>
 
 <body onload="whackacake.init()">
-<div id='game'>
+<div id='game' class='cursor_up'>
   
   <div id='score_div' >
       Score:<span id='game_score' >0</span>
