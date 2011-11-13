@@ -160,14 +160,20 @@ var whackacake = function all() {
         }
 
         this.loadImages = function() {
-            $this.images.cup = new Image();
-            $this.images.cup.src = "images/cup.jpeg";
+            var addImage = function(src, width, height) {
+                var im = new Image();
+                im.src = src;
+                im.width = width;
+                im.height = height;
+                return im;
+            }
+            $this.images.cup = addImage("images/cup.jpeg", 50, 50);
+            $this.images.ingredients = addImage("images/ingredients.png", 50, 50);
             $this.images.choc = new Image();
             $this.images.choc.src = "images/chocolate.jpg";
             $this.images.cakeLayers = new Image();
             $this.images.cakeLayers.src = "images/cake_layers.png";
-            $this.images.ingredients = new Image;
-            $this.images.ingredients.src = "images/ingredients.png"
+
         }
 
 
