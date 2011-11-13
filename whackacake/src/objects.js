@@ -34,6 +34,7 @@ objects = function(gameobj){
         };
 
         this.draw = function(ctx_cake_stack) {
+
             var i;
             for(i =0; i < $this.cakeSlices.length; i++) {
                 for(j =0; j < $this.cakeSlices[i].length; j++) {
@@ -238,9 +239,10 @@ objects = function(gameobj){
  	 *	and an ingredient to draw
  	 *
  	 **/
-    gameobj.Cup = function(sprite){
+    gameobj.Cup = function(frontSprite, backSprite){
     	var $this = this;
-    	this.sprite = sprite;
+    	this.sprite = backSprite;
+        this.frontSprite = frontSprite;
     	this.ingredient = null;
     	
     	this.setIngredient = function(ingredient){
@@ -265,10 +267,11 @@ objects = function(gameobj){
     	}
     	
     	this.draw = function(ctx){
-    		this.sprite.draw(ctx);
+    		$this.sprite.draw(ctx);
 	    	if(this.ingredient){
     			this.ingredient.draw(ctx);
     		}		
+            $this.frontSprite.draw(ctx);
     	}
     	
     	this.hit = function() {
