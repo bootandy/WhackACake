@@ -1,3 +1,5 @@
+foo = true;
+
 objects = function(gameobj){
     gameobj.CakeStack = function(cakeImage) {
         $this = this;
@@ -123,7 +125,6 @@ objects = function(gameobj){
                 this.coord.y = drawCoord.y;
                 if(this.animation.hasFinished()){
                     this.animation = null;
-                    console.log("finished");
                 }
             }
 
@@ -212,8 +213,7 @@ objects = function(gameobj){
             }
             if($this.animations[$this.activeIndex].hasFinished()){
                 $this.activeIndex += 1;
-                //Add one loopinterval to starttime because we are behind by one timestep
-                $this.animations[$this.activeIndex].start()//.start(gameobj.frameCount + gameobj.game.loopInterval);
+                $this.animations[$this.activeIndex].start()
             } 
             return $this.animations[$this.activeIndex].getLocation();
         }
@@ -233,9 +233,13 @@ objects = function(gameobj){
 
         this.getLocation = function(){
             if($this.animation.hasFinished()){
-                $this.animation.start(gameobj.frameCount + gameobj.game.loopInterval);
+                $this.animation.start();
             }
             return $this.animation.getLocation();
+        }
+
+        this.hasFinished = function(){
+            return false;
         }
     }
     
@@ -279,12 +283,18 @@ objects = function(gameobj){
 
         this.getIngredientAnimation = function(){
             var interpolator = function(currentTime, duration){return Math.pow(currentTime/duration, 3);};
-            var startPoint = $this.sprite.coord.clone();
-            var endPoint = $this.sprite.coord.add(new gameobj.Coords(0, -10));
+            var startPoint = $this.sprite.coord.add( new gameobj.Coords(0, -15));
+            var endPoint = startPoint.add(new gameobj.Coords(0, -20));
             var duration = gameobj.getDurationInFrames(250);
             var upAnimation = new gameobj.TransAnimation(startPoint, endPoint, duration, interpolator);
-            var downAnimation = new gameobj.TransAnimation(endPoint, startPoint, duration, interpolator);
-            return new gameobj.AnimationCollection([upAnimation, downAnimation]);
+
+
+            var bobDuration = gameobj.getDurationInFrames(100);
+            var topOfBob = endPoint.add(new gameobj.Coords(0, -10));
+            var upMoreAnimation = new gameobj.TransAnimation(endPoint, topOfBob, bobDuration, interpolator);
+            var downAgainAnimation = new gameobj.TransAnimation(topOfBob, endPoint, bobDuration, interpolator);
+            var bobAnimation = new gameobj.AnimationCollection([upMoreAnimation, downAgainAnimation]);
+            return new gameobj.AnimationCollection([upAnimation, new gameobj.RepeatingAnimation(bobAnimation)]);
         }
     	
     	this.updateState = function(){
