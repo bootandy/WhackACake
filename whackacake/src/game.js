@@ -53,7 +53,8 @@ var whackacake = function all() {
 
         my.game = new Game();
         my.game.init();
-        my.game.loop();
+        my.loop = setInterval("my.game.loop()", my.game.loopInterval);
+
     }
 
     /**
@@ -73,7 +74,7 @@ var whackacake = function all() {
         this.init = function() {
             $this.score = 0;
             $this.cakesFinished = 0;
-            $this.loopInterval = 15;
+            $this.loopInterval = 30;
             $this.startTime = new Date().getTime();
             // 1 per second - Actually, this is the expectation of the number of ingredients that should spawn in a frame.
             $this.spawnProbability = 3/100;
@@ -90,7 +91,7 @@ var whackacake = function all() {
             $this.game = document.getElementById("game");
             $this.ctx = my.canvas.getContext('2d');
             $this.ctx_cake_stack = my.canvas_cake_stack.getContext('2d');
-            $this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50, 50, $this.images.cursor);
+            //$this.cursor = new my.Cursor(my.canvas.x, my.canvas.y, 50, 50, $this.images.cursor);
             $this.background_left = new my.Background(my.canvas_cake_stack.width,my.canvas_cake_stack.height,$this.images.background_left);
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -98,7 +99,7 @@ var whackacake = function all() {
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            $this.game.addEventListener('mousemove', $this.cursor.setPosition);
+            //$this.game.addEventListener('mousemove', $this.cursor.setPosition);
         }
 
 
@@ -109,8 +110,8 @@ var whackacake = function all() {
             $this.drawAll();
 
             if (this.getTime() >= 0) {
-                setTimeout("whackacake.game.loop()", $this.loopInterval);
             } else {
+                clearInterval(my.loop);
                 this.gameOver();
             }
         }
@@ -180,7 +181,7 @@ var whackacake = function all() {
 
             var messageX = x - 50;
             var messageY = y - 50;
-            var scoreMessage
+            var scoreMessage;
             if (scoreToAdd > 0) {
                 scoreMessage = "+"+scoreToAdd
             } else {
@@ -259,7 +260,7 @@ var whackacake = function all() {
         this.drawAll = function() {
 
             $this.ctx.clearRect(0, 0, my.canvas.width, my.canvas.height);
-            $this.background_right.draw($this.ctx);
+            //$this.background_right.draw($this.ctx);
             this.scoreDisplay.innerHTML = $this.score;
             this.frameDisplay.innerHTML = my.frameCount;
             this.cakesDisplay.innerHTML = $this.cakesFinished;
@@ -286,7 +287,7 @@ var whackacake = function all() {
             }
 
             $this.ctx_cake_stack.clearRect(0, 0, my.canvas_cake_stack.width, my.canvas_cake_stack.height);
-            $this.background_left.draw($this.ctx_cake_stack);
+            //$this.background_left.draw($this.ctx_cake_stack);
             $this.cakeStack.draw($this.ctx_cake_stack);
             $this.cursor.draw($this.ctx, $this.ctx_cake_stack);
         }
