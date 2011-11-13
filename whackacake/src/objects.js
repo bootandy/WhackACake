@@ -32,7 +32,7 @@ objects = function(gameobj){
 
             $this.cakeSlices[gameobj.game.cakesFinished].push(new gameobj.CakeSlice(s));
         };
-
+        
         this.draw = function(ctx_cake_stack) {
 
             var i;
@@ -91,8 +91,10 @@ objects = function(gameobj){
             if (this.animation.hasFinished()){
                 return true;
             }
-
-            ctx.fillText($this.str, $this.coord.x, $this.coord.y );
+            
+            round_x = ~~ ($this.coord.x+0.5)
+            round_y = ~~ ($this.coord.y+0.5)
+            ctx.fillText($this.str, round_x, round_y);
             return false;
         }
 
@@ -126,8 +128,16 @@ objects = function(gameobj){
                     console.log("finished");
                 }
             }
-
-
+            
+            /**
+            bitwise operations is faster than math.floor
+            bitwise operation takes away digits after decimal point 
+            ~~ = switch bits and then switch again
+            adding 0.5 first so it rounds up to the closest number
+            **/ 
+            round_x= ~~ (this.coord.x+0.5);
+            round_y= ~~ (this.coord.y+0.5) 
+            
             ctx.drawImage(this.spriteImage,
                     Math.floor(this.coord.x - this.width/2),
                     Math.floor(this.coord.y - this.height/2),
