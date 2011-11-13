@@ -99,7 +99,7 @@ var whackacake = function all() {
             my.canvas.addEventListener("touchmove", $this.touchMove, true);
             my.canvas.addEventListener("touchend", $this.touchUp, false);
             my.canvas.addEventListener("touchcancel", $this.touchUp, false);
-            my.gameDiv.addEventListener('mousemove', $this.cursor.setPosition);
+            my.canvas.addEventListener('mousemove', $this.cursor.setPosition);
         }
 
 
