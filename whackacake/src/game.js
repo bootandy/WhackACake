@@ -212,7 +212,12 @@ var whackacake = function all() {
         this.loadSounds = function() {
             var addSound = function(src) {
                 var aud = document.createElement("audio");
-                aud.setAttribute("src", src);
+                // Set source files for audio
+                [".mp3", ".wav", ".ogg"].forEach(function(ext) {
+                    var src_el = document.createElement("source");
+                    src_el.setAttribute("src", src+ext);
+                    aud.appendChild(src_el);
+                });
                 aud.addEventListener('ended', function() {
                     this.currentTime=0;
                     this.pause();
@@ -220,8 +225,8 @@ var whackacake = function all() {
                 return aud;
             }
             $this.sounds = {}
-            $this.sounds.good_hit = addSound("good_hit");
-            $this.sounds.bad_hit = addSound("bad_hit");
+            $this.sounds.good_hit = addSound("sound/good_hit");
+            $this.sounds.bad_hit = addSound("sound/bad_hit");
         }
 
         this.incrementCakes = function() {
