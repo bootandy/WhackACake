@@ -52,8 +52,8 @@ var whackacake = function all() {
         gameTime:41,
         ingredientStaysTimeRandom:50,
         ingredientstaysTimeConstant:250,
-        goodItem:50,
-        badItem:-50,
+        goodScore:100,
+        badScore:-100,
         
         gameOverCallback:function(score){}
     };
@@ -104,6 +104,12 @@ var whackacake = function all() {
 
     my.setSpawnProb = function(value){
         my.config.spawnProbability = value;
+    }
+    my.setGoodScore = function(value){
+        my.config.goodScore = value;
+    }
+    my.setBadScore = function(value){
+        my.config.badScore = value;
     }
 
 
