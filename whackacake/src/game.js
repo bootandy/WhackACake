@@ -45,15 +45,16 @@ function merge(obj1, obj2) {
 
 
 
-var whackacake = function all(config) {
+var whackacake = function all() {
     my = {};
     my.config = {
         spawnProbability:3/100,
+        gameOverCallback:function(score){}
     };
-    my.config = merge(my.config, config);
 
 
-    my.init = function() {
+    my.init = function(config) {
+        my.config = merge(my.config, config);
         my.canvas = document.getElementById("main_canvas");
         my.canvas_cake_stack = document.getElementById("cake_stack");
         var screenWidth = 640;
@@ -72,10 +73,6 @@ var whackacake = function all(config) {
 
         console.debug("canvas: " + style);
 
-        //my.start();
-        //my.game = new Game();
-        //my.game.init();
-        //my.loop = setInterval("my.game.loop()", my.game.loopInterval);
 
     }
 
@@ -86,7 +83,7 @@ var whackacake = function all(config) {
     }
 
     my.setSpawnProb = function(value){
-        config.spawnProbability = value;
+        my.config.spawnProbability = value;
     }
 
 
@@ -119,7 +116,11 @@ var whackacake = function all(config) {
             $this.scoreDisplay = document.getElementById("game_score");
             $this.frameDisplay = document.getElementById("frames");
             $this.cakesDisplay = document.getElementById("cakes");
+            
+            //horrible hack to allow multiple games without refresh
             $this.timerDisplay = document.getElementById("timer");
+            $this.timerDisplay.setAttribute("style", ""); 
+
             $this.ctx = my.canvas.getContext('2d');
             $this.background_right = new my.Background(my.canvas.width,my.canvas.height,$this.images.background_right);
             my.canvas.addEventListener('click', $this.mouseDown);
@@ -323,7 +324,7 @@ var whackacake = function all(config) {
             if ($this.cakesFinished > 0) {
                 $this.score = $this.score * $this.cakesFinished
             }
-            alert("Game Over: Score: "+oldScore + " X Cakes Made: "+$this.cakesFinished+" = Final Score: "+ $this.score);
+            my.config.gameOverCallback($this.score);
         }
     }
 
