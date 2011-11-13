@@ -158,7 +158,7 @@ var whackacake = function all() {
         this.clickedIngredient = function(cup) {
             var type = cup.hasIngredient().getType();
             $this.cakeStack.addToCakeStack(type);
-            $this.score += cup.hit();
+            $this.score += cup.hit(); //animate score
         }
 
         this.loadImages = function() {
@@ -240,7 +240,11 @@ var whackacake = function all() {
         }
 
         this.gameOver = function() {
-            alert("Game Over: "+$this.score);
+            var oldScore = $this.score;
+            if ($this.cakesFinished > 0) {
+                $this.score = $this.score * $this.cakesFinished
+            }
+            alert("Game Over: Score: "+oldScore + " X Cakes Finished: "+$this.cakesFinished+" = Final Score: "+ $this.score);
         }
     }
     
